@@ -38,6 +38,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.statusLbl = new System.Windows.Forms.Label();
+            this.portHeader = new System.Windows.Forms.ColumnHeader();
             this.userMenuStrip.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -50,11 +51,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.userView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.userHeader,
-            this.ipHeader});
+            this.ipHeader,
+            this.portHeader});
             this.userView.ContextMenuStrip = this.userMenuStrip;
             this.userView.Location = new System.Drawing.Point(12, 27);
             this.userView.Name = "userView";
-            this.userView.Size = new System.Drawing.Size(776, 402);
+            this.userView.Size = new System.Drawing.Size(776, 401);
             this.userView.TabIndex = 8;
             this.userView.UseCompatibleStateImageBehavior = false;
             // 
@@ -74,6 +76,7 @@
             this.sendMessageBoxToolStripMenuItem});
             this.userMenuStrip.Name = "contextMenuStrip1";
             this.userMenuStrip.Size = new System.Drawing.Size(170, 26);
+            this.userMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.userMenuStrip_Opening);
             // 
             // sendMessageBoxToolStripMenuItem
             // 
@@ -107,11 +110,16 @@
             // 
             this.statusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.statusLbl.AutoSize = true;
-            this.statusLbl.Location = new System.Drawing.Point(10, 432);
+            this.statusLbl.Location = new System.Drawing.Point(9, 431);
             this.statusLbl.Name = "statusLbl";
             this.statusLbl.Size = new System.Drawing.Size(50, 15);
             this.statusLbl.TabIndex = 9;
             this.statusLbl.Text = "Status: -";
+            // 
+            // portHeader
+            // 
+            this.portHeader.Text = "Port";
+            this.portHeader.Width = 120;
             // 
             // Main
             // 
@@ -123,6 +131,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Main";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SharpRAT";
             this.Load += new System.EventHandler(this.Main_Load);
             this.userMenuStrip.ResumeLayout(false);
@@ -144,5 +153,6 @@
         private ToolStripMenuItem sendMessageBoxToolStripMenuItem;
         private Label statusLbl;
         private ColumnHeader ipHeader;
+        private ColumnHeader portHeader;
     }
 }

@@ -10,8 +10,35 @@ namespace Client.Client
 {
     internal class SocketClient
     {
-        string szTempName = "Client1";
-        bool nameSent = false;
+        bool bNameSent = false;
+        private Socket serverSocket;
+
+        public Socket GetServerSocket()
+        {
+            return serverSocket;
+        }
+
+        private bool SendName()
+        {
+            serverSocket.Send(Encoding.ASCII.GetBytes("<CMD=NAME>" + WindowsHelper.GetUsername() + "<EOF>"));
+            return true;
+        }
+
+        private void ParseData(string data)
+        {
+            string tempString = data.Replace("<EOF>", "");
+
+            if (tempString.StartsWith("<CMD=MSGBOX>"))
+            {
+                tempString = tempString.Replace("<CMD=MSGBOX>", "");
+                Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_SHOW_MESSAGEBOX);
+            }
+            else if(tempString.StartsWith("<PING>"))
+            {
+                serverSocket.Send(Encoding.ASCII.GetBytes(tempString));
+            }
+        }
+
         public void ExecuteClient()
         {
             while (true)
@@ -24,33 +51,31 @@ namespace Client.Client
                     IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11111);
 
                     // TCP/IP Socket.
-                    Socket sender = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    serverSocket = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                     try
                     {
                         // Connect to server.
-                        sender.Connect(localEndPoint);
+                        serverSocket.Connect(localEndPoint);
 
-                        // Send name message to server
-                        if (!nameSent)
+                        if (!bNameSent)
+                            bNameSent = SendName();
+
+                        while (serverSocket.Connected)
                         {
-                            sender.Send(Encoding.ASCII.GetBytes(szTempName + "<EOF>"));
-                            nameSent = true;
+                            // Data buffer
+                            byte[] messageReceived = new byte[1024];
+                            int byteRecv = serverSocket.Receive(messageReceived);
+                            ParseData(Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
                         }
-
-                        // Data buffer
-                        byte[] messageReceived = new byte[1024];
-
-                        int byteRecv = sender.Receive(messageReceived);
-                        Console.WriteLine("Message from Server -> {0}", Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
-
-                        sender.Shutdown(SocketShutdown.Both);
-                        sender.Close();
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.ToString());
                     }
+
+                    if (!serverSocket.Connected)
+                        bNameSent = false;
                 }
                 catch (Exception e)
                 {
