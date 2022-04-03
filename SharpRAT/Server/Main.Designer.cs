@@ -28,19 +28,121 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            this.userView = new System.Windows.Forms.ListView();
+            this.userHeader = new System.Windows.Forms.ColumnHeader();
+            this.ipHeader = new System.Windows.Forms.ColumnHeader();
+            this.userMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.sendMessageBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
+            this.statusLbl = new System.Windows.Forms.Label();
+            this.userMenuStrip.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // userView
+            // 
+            this.userView.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
+            this.userView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.userView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.userHeader,
+            this.ipHeader});
+            this.userView.ContextMenuStrip = this.userMenuStrip;
+            this.userView.Location = new System.Drawing.Point(12, 27);
+            this.userView.Name = "userView";
+            this.userView.Size = new System.Drawing.Size(776, 402);
+            this.userView.TabIndex = 8;
+            this.userView.UseCompatibleStateImageBehavior = false;
+            // 
+            // userHeader
+            // 
+            this.userHeader.Text = "User";
+            this.userHeader.Width = 120;
+            // 
+            // ipHeader
+            // 
+            this.ipHeader.Text = "IP Address";
+            this.ipHeader.Width = 200;
+            // 
+            // userMenuStrip
+            // 
+            this.userMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sendMessageBoxToolStripMenuItem});
+            this.userMenuStrip.Name = "contextMenuStrip1";
+            this.userMenuStrip.Size = new System.Drawing.Size(170, 26);
+            // 
+            // sendMessageBoxToolStripMenuItem
+            // 
+            this.sendMessageBoxToolStripMenuItem.Name = "sendMessageBoxToolStripMenuItem";
+            this.sendMessageBoxToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.sendMessageBoxToolStripMenuItem.Text = "Send MessageBox";
+            this.sendMessageBoxToolStripMenuItem.Click += new System.EventHandler(this.sendMessageBoxToolStripMenuItem_Click);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.TabIndex = 1;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // uiUpdateTimer
+            // 
+            this.uiUpdateTimer.Enabled = true;
+            this.uiUpdateTimer.Tick += new System.EventHandler(this.uiUpdateTimer_Tick);
+            // 
+            // statusLbl
+            // 
+            this.statusLbl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.statusLbl.AutoSize = true;
+            this.statusLbl.Location = new System.Drawing.Point(10, 432);
+            this.statusLbl.Name = "statusLbl";
+            this.statusLbl.Size = new System.Drawing.Size(50, 15);
+            this.statusLbl.TabIndex = 9;
+            this.statusLbl.Text = "Status: -";
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.statusLbl);
+            this.Controls.Add(this.userView);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Main";
             this.Text = "SharpRAT";
+            this.Load += new System.EventHandler(this.Main_Load);
+            this.userMenuStrip.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
+
+        private ListView userView;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem fileToolStripMenuItem;
+        private ColumnHeader userHeader;
+        private System.Windows.Forms.Timer uiUpdateTimer;
+        private ContextMenuStrip userMenuStrip;
+        private ToolStripMenuItem sendMessageBoxToolStripMenuItem;
+        private Label statusLbl;
+        private ColumnHeader ipHeader;
     }
 }
