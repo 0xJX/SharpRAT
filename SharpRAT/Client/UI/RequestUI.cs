@@ -1,4 +1,4 @@
-﻿namespace Server
+﻿namespace Client
 {
     public class RequestItem : RequestUI
     {
@@ -13,9 +13,7 @@
 
         public enum RequestType
         {
-            UI_ADD_USER = 0,
-            UI_REMOVE_USER = 1,
-            UI_UPDATE_STATUS
+            UI_SHOW_MESSAGEBOX = 0
         }
 
         public List<RequestItem> GetRequests()
@@ -26,7 +24,7 @@
         public int RequestReceived()
         {
             int i = 0;
-            foreach(RequestItem request in GetRequests())
+            foreach (RequestItem request in GetRequests())
             {
                 i++;
                 if (request.bRequest)
@@ -49,12 +47,12 @@
 
         public string GetRequestText(int index)
         {
-            return GetRequests()[index-1].szText;
+            return GetRequests()[index - 1].szText;
         }
 
         public RequestType GetRequestType(int index)
         {
-            return GetRequests()[index-1].requestType;
+            return GetRequests()[index - 1].requestType;
         }
     }
 }

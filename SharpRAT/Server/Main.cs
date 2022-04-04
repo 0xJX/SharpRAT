@@ -1,32 +1,56 @@
+using Server.Server;
+
 namespace Server
 {
     public partial class Main : Form
     {
         private readonly ImageList imageList;
-        private readonly Server.SocketServer socketServer;
+        private readonly SocketServer socketServer;
         #pragma warning disable CS8618
             public static RequestUI uiRequests;
-        #pragma warning restore CS8618
+#pragma warning restore CS8618
 
         public Main()
         {
-            socketServer = new Server.SocketServer();
+            socketServer = new SocketServer();
             uiRequests = new RequestUI();
             imageList = new ImageList();
             InitializeComponent();
         }
-
-        public void AddUserToViewList(string text)
+        private void AddUserToViewlist(string text)
         {
+            // Parse text
+            string
+                szName = text.Split("<SPLIT>")[0],
+                szIPAddress = text.Split("<SPLIT>")[1],
+                szPort = text.Split("<SPLIT>")[2];
+
             Bitmap image;
             image = Properties.Resources.user;
             imageList.Images.Add(image);
             userView.SmallImageList = imageList;
             userView.View = View.Details;
-            userView.Items.Add(new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = text });
+            ListViewItem userViewItem = new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = szName };
+            userViewItem.SubItems.Add(szIPAddress);
+            userViewItem.SubItems.Add(szPort);
+            userView.Items.Add(userViewItem);
         }
 
-        public void UpdateStatus(string statusText)
+        private void RemoveUserFromViewlist(string text)
+        {
+            int index = int.Parse(text);
+            try
+            {
+                userView.Items[index].Remove();
+                userView.Update();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void UpdateStatus(string statusText)
         {
             statusLbl.Text = "Status: " + statusText;
         }
@@ -48,7 +72,10 @@ namespace Server
                 switch(uiRequests.GetRequestType(requestID)) // Check request type and call the correct function.
                 {
                     case RequestUI.RequestType.UI_ADD_USER:
-                        AddUserToViewList(uiRequests.GetRequestText(requestID));
+                        AddUserToViewlist(uiRequests.GetRequestText(requestID));
+                        break;
+                    case RequestUI.RequestType.UI_REMOVE_USER:
+                        RemoveUserFromViewlist(uiRequests.GetRequestText(requestID));
                         break;
                     case RequestUI.RequestType.UI_UPDATE_STATUS:
                         UpdateStatus(uiRequests.GetRequestText(requestID));
@@ -59,7 +86,14 @@ namespace Server
 
         private void sendMessageBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // todo.
+            MessageboxCreator messageboxCreator = new MessageboxCreator(socketServer, userView.SelectedItems[0].Index);
+            messageboxCreator.ShowDialog();
+        }
+
+        private void userMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(userView.SelectedItems.Count == 0) // No items selected, no need to open.
+                e.Cancel = true;
         }
     }
 }

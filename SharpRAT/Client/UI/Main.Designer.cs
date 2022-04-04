@@ -28,7 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
+            // 
+            // uiUpdateTimer
+            // 
+            this.uiUpdateTimer.Enabled = true;
+            this.uiUpdateTimer.Tick += new System.EventHandler(this.uiUpdateTimer_Tick);
             // 
             // Main
             // 
@@ -42,11 +49,14 @@
             this.Opacity = 0D;
             this.ShowInTaskbar = false;
             this.Text = "SharpRAT";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Load += new System.EventHandler(this.Main_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer uiUpdateTimer;
     }
 }
