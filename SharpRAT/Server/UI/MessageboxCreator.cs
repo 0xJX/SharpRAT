@@ -8,11 +8,6 @@ namespace Server
         private SocketServer socketServer;
         private MessageBoxIcon selectedIcon = MessageBoxIcon.Information;
 
-        public MessageboxCreator()
-        {
-            InitializeComponent();
-        }
-
         public MessageboxCreator(SocketServer socketServer, int iClientIndex)
         {
             InitializeComponent();

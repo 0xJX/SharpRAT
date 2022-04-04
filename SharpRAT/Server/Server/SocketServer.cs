@@ -21,7 +21,14 @@ namespace Server.Server
 
         public Client GetClient(int index)
         {
-            return clients[index];
+            try
+            {
+                return clients[index];
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public void CheckClientsThread()

