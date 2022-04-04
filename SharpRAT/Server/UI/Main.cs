@@ -27,8 +27,9 @@ namespace Server
 
             // Add data to viewList.
             Bitmap image;
-            image = Properties.Resources.user;
+            image = WinIcons.GetImageFromIcon("dsuiext.dll", (int)WinIcons.Dsuiext.User_ICO);
             imageList.Images.Add(image);
+            imageList.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             userView.SmallImageList = imageList;
             userView.View = View.Details;
             ListViewItem userViewItem = new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = szName };
@@ -58,6 +59,15 @@ namespace Server
 
         private void Main_Load(object sender, EventArgs e)
         {
+            /* 
+             Load icons from Windows internal dlls with quite bad quality,
+             it would be smarter to extract the icon files to TEMP and load them from there for better quality.
+            */
+            settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("wmploc.dll", (int)WinIcons.Wmploc.Settings_ICO);
+            sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard_ICO);
+            userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain_ICO);
+            disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed_ICO);
+
             // Start the server on it's own thread, so it does not hog all the UI resources.
             Thread serverThread = new Thread(socketServer.ExecuteServer);
             serverThread.IsBackground = true;

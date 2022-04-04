@@ -39,6 +39,7 @@
             this.disableTaskmanagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.statusLbl = new System.Windows.Forms.Label();
             this.userMenuStrip.SuspendLayout();
@@ -121,9 +122,17 @@
             // 
             // fileToolStripMenuItem
             // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.fileToolStripMenuItem.Text = "Menu";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.settingsToolStripMenuItem.Text = "Settings";
             // 
             // uiUpdateTimer
             // 
@@ -149,6 +158,7 @@
             this.Controls.Add(this.userView);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.MinimumSize = new System.Drawing.Size(450, 250);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SharpRAT";
@@ -176,5 +186,6 @@
         private ColumnHeader portHeader;
         private ToolStripMenuItem userControlToolStripMenuItem;
         private ToolStripMenuItem disableTaskmanagerToolStripMenuItem;
+        private ToolStripMenuItem settingsToolStripMenuItem;
     }
 }
