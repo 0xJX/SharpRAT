@@ -6,6 +6,22 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+    <NoWarn>1701;1702;CS8600;CS8602;CS8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+    <NoWarn>1701;1702;CS8600;CS8602;CS8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 
 </Project>

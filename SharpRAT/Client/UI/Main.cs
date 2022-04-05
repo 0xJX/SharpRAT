@@ -44,7 +44,12 @@ namespace Client
                     selectedIcon = MessageBoxIcon.Question;
                     break;
             }
-            MessageBox.Show(stringSplit[0], stringSplit[1], MessageBoxButtons.OK, selectedIcon);
+
+            using (Form form = new Form())
+            {
+                form.TopMost = true;
+                MessageBox.Show(form, stringSplit[0], stringSplit[1], MessageBoxButtons.OK, selectedIcon);
+            }
         }
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)

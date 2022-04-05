@@ -8,11 +8,6 @@ namespace Server
         private SocketServer socketServer;
         private MessageBoxIcon selectedIcon = MessageBoxIcon.Information;
 
-        public MessageboxCreator()
-        {
-            InitializeComponent();
-        }
-
         public MessageboxCreator(SocketServer socketServer, int iClientIndex)
         {
             InitializeComponent();
@@ -44,15 +39,19 @@ namespace Server
             {
                 case 0:
                     selectedIcon = MessageBoxIcon.Exclamation;
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Warning_ICO);
                     break;
                 case 1:
                     selectedIcon = MessageBoxIcon.Information;
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info_ICO);
                     break;
                 case 2:
                     selectedIcon = MessageBoxIcon.Error;
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("comres.dll", (int)WinIcons.ComresID.Error_ICO);
                     break;
                 case 3:
                     selectedIcon = MessageBoxIcon.Question;
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Question_ICO);
                     break;
             }
         }
