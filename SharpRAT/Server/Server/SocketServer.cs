@@ -9,7 +9,7 @@ namespace Server.Server
         private static List<Client> clients = new List<Client>();
         const int
             iMaxConnectedUsers = 100,
-            iPingWaitTime = 3000;
+            iPingWaitTime = 1000;
 
         public class Client
         {
@@ -35,23 +35,29 @@ namespace Server.Server
         {
             while (true)
             {
-                for (int i = 0; i < clients.Count; i++)
+                try
                 {
-                    // No clients.
-                    if (clients.Count == 0)
-                        break;
-
-                    // Socket was valid, continue on the list.
-                    if (GetClient(i).socket.Connected)
+                    for (int i = 0; i < clients.Count; i++)
                     {
-                        // Ping the client just to be sure.
-                        if(Ping(GetClient(i).socket))
-                            continue;
-                    }
+                        // No clients.
+                        if (clients.Count == 0)
+                            break;
 
-                    // Invalid connection, remove from the list
-                    clients.Remove(GetClient(i));
-                    Main.uiRequests.Request(i.ToString(), RequestUI.RequestType.UI_REMOVE_USER);
+                        // Socket was valid, continue on the list.
+                        if (GetClient(i).socket.Connected)
+                        {
+                            // Ping the client just to be sure.
+                            if (Ping(GetClient(i).socket))
+                                continue;
+                        }
+
+                        // Invalid connection, remove from the list
+                        clients.Remove(GetClient(i));
+                        Main.uiRequests.Request(i.ToString(), RequestUI.RequestType.UI_REMOVE_USER);
+                    }
+                }catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
                 Thread.Sleep(100);
             }
@@ -59,11 +65,11 @@ namespace Server.Server
 
         public bool Ping(Socket clientSocket)
         {
-            Send(clientSocket, "<PING>");
-            Thread.Sleep(iPingWaitTime);
             byte[] buffer = new byte[1024];
             try
             {
+                Send(clientSocket, "<PING>");
+                Thread.Sleep(iPingWaitTime);
                 clientSocket.Receive(buffer);
             }
             catch(SocketException)
@@ -161,12 +167,13 @@ namespace Server.Server
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                Console.WriteLine(e.Message);
             }
         }
 
         public void ExecuteServer()
         {
+            // Ping clients on background thread.
             Thread checkClientsThread = new Thread(CheckClientsThread);
             checkClientsThread.IsBackground = true;
             checkClientsThread.Start();
@@ -196,7 +203,7 @@ namespace Server.Server
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine(e.Message);
                 }
                 Thread.Sleep(100);
             }

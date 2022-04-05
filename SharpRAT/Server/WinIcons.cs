@@ -7,6 +7,8 @@ namespace Server
         //https://www.digitalcitizen.life/where-find-most-windows-10s-native-icons/
         public enum ShellID // https://help4windows.com/windows_8_shell32_dll.shtml
         {
+            Shutdown_ICO = 27,
+            Config_ICO = 69,
             Keychain_ICO = 104,
             Question_ICO = 154,
             PcKeyboard_ICO = 173,

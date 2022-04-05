@@ -7,7 +7,9 @@ namespace Client.Client
 {
     internal class SocketClient
     {
-        bool bNameSent = false;
+        bool 
+            bShouldRun = true,
+            bNameSent = false;
         private Socket serverSocket;
 
         public Socket GetServerSocket()
@@ -17,7 +19,7 @@ namespace Client.Client
 
         private bool SendName()
         {
-            serverSocket.Send(Encoding.ASCII.GetBytes("<CMD=NAME>" + WindowsHelper.GetUsername() + "<EOF>"));
+            GetServerSocket().Send(Encoding.ASCII.GetBytes("<CMD=NAME>" + WindowsHelper.GetUsername() + "<EOF>"));
             return true;
         }
 
@@ -32,7 +34,7 @@ namespace Client.Client
             }
             else if(tempString.StartsWith("<PING>"))
             {
-                serverSocket.Send(Encoding.ASCII.GetBytes(tempString));
+                GetServerSocket().Send(Encoding.ASCII.GetBytes(tempString));
             }
             else if(tempString.StartsWith("<SET-TASKMGR>"))
             {
@@ -45,13 +47,20 @@ namespace Client.Client
                 tempString = tempString.Replace("<GET-REGKEY>", "");
                 string[] split = tempString.Split("<SPLIT>");
                 string returnString = WindowsHelper.ReadRegistryKey(split[0], split[1]);
-                serverSocket.Send(Encoding.ASCII.GetBytes("<GET-REGKEY>" + returnString));
+                GetServerSocket().Send(Encoding.ASCII.GetBytes("<GET-REGKEY>" + returnString));
+            }
+            else if(tempString.StartsWith("<SHUTDOWN-CLIENT>"))
+            {
+                bShouldRun = false;
+                GetServerSocket().Disconnect(false);
+                GetServerSocket().Close();
+                Application.Exit();
             }
         }
 
         public void ExecuteClient()
         {
-            while (true)
+            while (bShouldRun)
             {
                 try
                 {
@@ -64,7 +73,7 @@ namespace Client.Client
                     serverSocket = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                     // Connect to server.
-                    serverSocket.Connect(localEndPoint);
+                    GetServerSocket().Connect(localEndPoint);
 
                     if (!bNameSent)
                         bNameSent = SendName();
