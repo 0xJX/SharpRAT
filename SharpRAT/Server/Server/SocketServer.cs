@@ -170,29 +170,10 @@ namespace Server.Server
                 Console.WriteLine(e.Message);
             }
         }
-        //function to create or add onto an existing log, takes in message and the users name as parameter
-        public static bool AddToLog(string strMessage, string userName)
-        {
-            try
-            {
-                string logPath = $"C:/Temp/{userName}.txt";
-                using (StreamWriter sw = new StreamWriter(logPath, true))
-                {
-                    sw.WriteLine($"{DateTime.Now}: { strMessage}");
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
 
         public void ExecuteServer()
         {
-            //creates the temp folder for the logs
-            Directory.CreateDirectory("C:/Temp"); 
-            AddToLog("starting server", "test");
+            Logging.Info("starting server", "log");
             // Ping clients on background thread.
             Thread checkClientsThread = new Thread(CheckClientsThread);
             checkClientsThread.IsBackground = true;
