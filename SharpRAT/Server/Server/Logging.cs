@@ -26,17 +26,17 @@ namespace Server.Server
         }
         public static void Info(string text, string userName)
         {
-            var textX = $"[INFO] {text}";
+            string textX = $"[INFO] {text}";
             AddToLog(textX, userName);
         }
         public static void Error(string text, string userName)
         {
-            var textX = $"[ERROR] {text}";
+            string textX = $"[ERROR] {text}";
             AddToLog(textX, userName);
         }
         public static void Action(string text, string userName)
         {
-            var textX = $"[ACTION] {text}";
+            string textX = $"[ACTION] {text}";
             AddToLog(textX, userName);
         }
     }
