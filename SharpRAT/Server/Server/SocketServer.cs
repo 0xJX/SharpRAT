@@ -173,6 +173,7 @@ namespace Server.Server
 
         public void ExecuteServer()
         {
+            Logging.Info("starting server", "log");
             // Ping clients on background thread.
             Thread checkClientsThread = new Thread(CheckClientsThread);
             checkClientsThread.IsBackground = true;

@@ -16,6 +16,7 @@ namespace Server
             uiRequests = new RequestUI();
             imageList = new ImageList();
             InitializeComponent();
+
         }
         private void AddUserToViewlist(string text)
         {
@@ -63,6 +64,10 @@ namespace Server
              Load icons from Windows internal dlls with quite bad quality,
              it would be smarter to extract the icon files to TEMP and load them from there for better quality.
             */
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT"))
+            {
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\");
+            }
             settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("wmploc.dll", (int)WinIcons.Wmploc.Settings_ICO);
             sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard_ICO);
             userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain_ICO);
