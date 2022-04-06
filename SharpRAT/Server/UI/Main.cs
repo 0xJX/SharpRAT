@@ -67,6 +67,7 @@ namespace Server
             sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard_ICO);
             userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain_ICO);
             disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed_ICO);
+            shutdownClientToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Shutdown_ICO);
 
             // Start the server on it's own thread, so it does not hog all the UI resources.
             Thread serverThread = new Thread(socketServer.ExecuteServer);
@@ -115,6 +116,17 @@ namespace Server
             string messageBoxStr
                 = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString() + "<EOF>";
             socketServer.Send(socketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
+        }
+
+        private void shutdownClientToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            socketServer.Send(socketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SHUTDOWN-CLIENT>" + "<EOF>");
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UI.Settings settings = new UI.Settings();
+            settings.ShowDialog();
         }
     }
 }

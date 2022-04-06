@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.userView = new System.Windows.Forms.ListView();
             this.userHeader = new System.Windows.Forms.ColumnHeader();
             this.ipHeader = new System.Windows.Forms.ColumnHeader();
@@ -37,6 +38,7 @@
             this.sendMessageBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userControlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableTaskmanagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shutdownClientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,7 +99,8 @@
             // userControlToolStripMenuItem
             // 
             this.userControlToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.disableTaskmanagerToolStripMenuItem});
+            this.disableTaskmanagerToolStripMenuItem,
+            this.shutdownClientToolStripMenuItem});
             this.userControlToolStripMenuItem.Name = "userControlToolStripMenuItem";
             this.userControlToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.userControlToolStripMenuItem.Text = "User Control";
@@ -106,12 +109,20 @@
             // 
             this.disableTaskmanagerToolStripMenuItem.CheckOnClick = true;
             this.disableTaskmanagerToolStripMenuItem.Name = "disableTaskmanagerToolStripMenuItem";
-            this.disableTaskmanagerToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.disableTaskmanagerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.disableTaskmanagerToolStripMenuItem.Text = "Disable Taskmanager";
             this.disableTaskmanagerToolStripMenuItem.CheckedChanged += new System.EventHandler(this.disableTaskmanagerToolStripMenuItem_CheckedChanged);
             // 
+            // shutdownClientToolStripMenuItem
+            // 
+            this.shutdownClientToolStripMenuItem.Name = "shutdownClientToolStripMenuItem";
+            this.shutdownClientToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.shutdownClientToolStripMenuItem.Text = "Shutdown SharpRAT client";
+            this.shutdownClientToolStripMenuItem.Click += new System.EventHandler(this.shutdownClientToolStripMenuItem_Click);
+            // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.Color.White;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -131,8 +142,9 @@
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // uiUpdateTimer
             // 
@@ -153,10 +165,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.statusLbl);
             this.Controls.Add(this.userView);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(450, 250);
             this.Name = "Main";
@@ -187,5 +201,6 @@
         private ToolStripMenuItem userControlToolStripMenuItem;
         private ToolStripMenuItem disableTaskmanagerToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem shutdownClientToolStripMenuItem;
     }
 }
