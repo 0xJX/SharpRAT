@@ -25,7 +25,7 @@ namespace Server
             string messageBoxStr
                 = "<CMD=MSGBOX>" + textBox.Text + "<SPLIT>" + titleBox.Text + "<SPLIT>" +
                  msgTypeBox.SelectedIndex.ToString() + "<EOF>";
-            socketServer.Send(socketServer.GetClient(iSelectedIndex).socket, messageBoxStr);
+            socketServer.Send(SocketServer.GetClient(iSelectedIndex).socket, messageBoxStr);
         }
 
         private void testBtn_Click(object sender, EventArgs e)

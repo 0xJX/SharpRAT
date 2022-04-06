@@ -28,10 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
             this.tabControl = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.mainPage = new System.Windows.Forms.TabPage();
+            this.logPage = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.refreshBtn = new System.Windows.Forms.Button();
+            this.logAutoUpdate = new System.Windows.Forms.CheckBox();
+            this.testWriteBtn = new System.Windows.Forms.Button();
+            this.clearLogBtn = new System.Windows.Forms.Button();
+            this.logTextBox = new System.Windows.Forms.RichTextBox();
+            this.aboutPage = new System.Windows.Forms.TabPage();
             this.label5 = new System.Windows.Forms.Label();
             this.versionLbl = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
@@ -41,8 +49,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.imgBox = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.updateLogTimer = new System.Windows.Forms.Timer(this.components);
             this.tabControl.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.logPage.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.aboutPage.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgBox)).BeginInit();
@@ -53,37 +64,129 @@
             this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl.Controls.Add(this.tabPage1);
-            this.tabControl.Controls.Add(this.tabPage2);
+            this.tabControl.Controls.Add(this.mainPage);
+            this.tabControl.Controls.Add(this.logPage);
+            this.tabControl.Controls.Add(this.aboutPage);
             this.tabControl.Location = new System.Drawing.Point(12, 72);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(565, 322);
             this.tabControl.TabIndex = 0;
+            this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
             // 
-            // tabPage1
+            // mainPage
             // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(557, 294);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Main";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.mainPage.Location = new System.Drawing.Point(4, 24);
+            this.mainPage.Name = "mainPage";
+            this.mainPage.Padding = new System.Windows.Forms.Padding(3);
+            this.mainPage.Size = new System.Drawing.Size(557, 294);
+            this.mainPage.TabIndex = 0;
+            this.mainPage.Text = "Main";
+            this.mainPage.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // logPage
             // 
-            this.tabPage2.Controls.Add(this.label5);
-            this.tabPage2.Controls.Add(this.versionLbl);
-            this.tabPage2.Controls.Add(this.linkLabel1);
-            this.tabPage2.Controls.Add(this.panel1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(557, 294);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "About";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.logPage.Controls.Add(this.groupBox1);
+            this.logPage.Controls.Add(this.logTextBox);
+            this.logPage.Location = new System.Drawing.Point(4, 24);
+            this.logPage.Name = "logPage";
+            this.logPage.Padding = new System.Windows.Forms.Padding(3);
+            this.logPage.Size = new System.Drawing.Size(557, 294);
+            this.logPage.TabIndex = 1;
+            this.logPage.Text = "Log";
+            this.logPage.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.refreshBtn);
+            this.groupBox1.Controls.Add(this.logAutoUpdate);
+            this.groupBox1.Controls.Add(this.testWriteBtn);
+            this.groupBox1.Controls.Add(this.clearLogBtn);
+            this.groupBox1.Location = new System.Drawing.Point(6, 241);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(545, 47);
+            this.groupBox1.TabIndex = 1;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Log control";
+            // 
+            // refreshBtn
+            // 
+            this.refreshBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.refreshBtn.Location = new System.Drawing.Point(296, 16);
+            this.refreshBtn.Name = "refreshBtn";
+            this.refreshBtn.Size = new System.Drawing.Size(77, 25);
+            this.refreshBtn.TabIndex = 3;
+            this.refreshBtn.Text = "Refresh";
+            this.refreshBtn.UseVisualStyleBackColor = true;
+            this.refreshBtn.Click += new System.EventHandler(this.refreshBtn_Click);
+            // 
+            // logAutoUpdate
+            // 
+            this.logAutoUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.logAutoUpdate.AutoSize = true;
+            this.logAutoUpdate.Location = new System.Drawing.Point(204, 20);
+            this.logAutoUpdate.Name = "logAutoUpdate";
+            this.logAutoUpdate.Size = new System.Drawing.Size(91, 19);
+            this.logAutoUpdate.TabIndex = 2;
+            this.logAutoUpdate.Text = "Auto refresh";
+            this.logAutoUpdate.UseVisualStyleBackColor = true;
+            this.logAutoUpdate.CheckedChanged += new System.EventHandler(this.logAutoUpdate_CheckedChanged);
+            // 
+            // testWriteBtn
+            // 
+            this.testWriteBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.testWriteBtn.Location = new System.Drawing.Point(379, 16);
+            this.testWriteBtn.Name = "testWriteBtn";
+            this.testWriteBtn.Size = new System.Drawing.Size(77, 25);
+            this.testWriteBtn.TabIndex = 1;
+            this.testWriteBtn.Text = "Test write";
+            this.testWriteBtn.UseVisualStyleBackColor = true;
+            this.testWriteBtn.Click += new System.EventHandler(this.testWriteBtn_Click);
+            // 
+            // clearLogBtn
+            // 
+            this.clearLogBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.clearLogBtn.Location = new System.Drawing.Point(462, 16);
+            this.clearLogBtn.Name = "clearLogBtn";
+            this.clearLogBtn.Size = new System.Drawing.Size(77, 25);
+            this.clearLogBtn.TabIndex = 0;
+            this.clearLogBtn.Text = "Clear log";
+            this.clearLogBtn.UseVisualStyleBackColor = true;
+            this.clearLogBtn.Click += new System.EventHandler(this.clearLogBtn_Click);
+            // 
+            // logTextBox
+            // 
+            this.logTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.logTextBox.AutoWordSelection = true;
+            this.logTextBox.BackColor = System.Drawing.Color.White;
+            this.logTextBox.HideSelection = false;
+            this.logTextBox.Location = new System.Drawing.Point(6, 6);
+            this.logTextBox.Name = "logTextBox";
+            this.logTextBox.ReadOnly = true;
+            this.logTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.logTextBox.ShowSelectionMargin = true;
+            this.logTextBox.Size = new System.Drawing.Size(545, 232);
+            this.logTextBox.TabIndex = 0;
+            this.logTextBox.Text = "";
+            this.logTextBox.WordWrap = false;
+            // 
+            // aboutPage
+            // 
+            this.aboutPage.Controls.Add(this.label5);
+            this.aboutPage.Controls.Add(this.versionLbl);
+            this.aboutPage.Controls.Add(this.linkLabel1);
+            this.aboutPage.Controls.Add(this.panel1);
+            this.aboutPage.Location = new System.Drawing.Point(4, 24);
+            this.aboutPage.Name = "aboutPage";
+            this.aboutPage.Padding = new System.Windows.Forms.Padding(3);
+            this.aboutPage.Size = new System.Drawing.Size(557, 294);
+            this.aboutPage.TabIndex = 2;
+            this.aboutPage.Text = "About";
+            this.aboutPage.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -183,6 +286,11 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Settings";
             // 
+            // updateLogTimer
+            // 
+            this.updateLogTimer.Interval = 500;
+            this.updateLogTimer.Tick += new System.EventHandler(this.updateLogTimer_Tick);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -200,8 +308,11 @@
             this.TopMost = true;
             this.Load += new System.EventHandler(this.Settings_Load);
             this.tabControl.ResumeLayout(false);
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.logPage.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.aboutPage.ResumeLayout(false);
+            this.aboutPage.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -214,8 +325,9 @@
         #endregion
 
         private TabControl tabControl;
-        private TabPage tabPage1;
-        private TabPage tabPage2;
+        private TabPage mainPage;
+        private TabPage logPage;
+        private TabPage aboutPage;
         private PictureBox imgBox;
         private Label label1;
         private Label label3;
@@ -225,5 +337,12 @@
         private LinkLabel linkLabel1;
         private Label label5;
         private Label versionLbl;
+        private RichTextBox logTextBox;
+        private GroupBox groupBox1;
+        private Button clearLogBtn;
+        private System.Windows.Forms.Timer updateLogTimer;
+        private Button testWriteBtn;
+        private Button refreshBtn;
+        private CheckBox logAutoUpdate;
     }
 }

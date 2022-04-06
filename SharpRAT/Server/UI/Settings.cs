@@ -11,9 +11,37 @@ namespace Server.UI
             InitializeComponent();
         }
 
+        private void SetWordColor(string selectedWord, Color color, int startIndex = 0)
+        {
+            if (logTextBox.Text.Contains(selectedWord))
+            {
+                int 
+                    index = -1,
+                    iSelectStart = logTextBox.SelectionStart;
+
+                while ((index = logTextBox.Text.IndexOf(selectedWord, (index + 1))) != -1)
+                {
+                    logTextBox.Select((index + startIndex), selectedWord.Length);
+                    logTextBox.SelectionColor = color;
+                    logTextBox.Select(iSelectStart, 0);
+                }
+            }
+        }
+
+        private void RefreshLogBox()
+        {
+            logTextBox.Text = Server.Log.ReadAll();
+            logTextBox.SelectionStart = logTextBox.Text.Length;
+
+            SetWordColor("[INFO]", Color.SteelBlue);
+            SetWordColor("[ERROR]", Color.Red);
+            SetWordColor("[ACTION]", Color.Orange);
+        }
+
         private void Settings_Load(object sender, EventArgs e)
         {
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Config_ICO, false));
+            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FileSearch_ICO, false));
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info_ICO, false));
             tabImages.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             tabControl.ImageList = tabImages;
@@ -32,6 +60,42 @@ namespace Server.UI
         private void linkLabel1_Click(object sender, EventArgs e)
         {
             Process.Start(new ProcessStartInfo("https://github.com/0xJX/SharpRAT") { UseShellExecute = true });
+        }
+
+        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(tabControl.SelectedIndex == 1 /* Log Page */)
+            {
+                RefreshLogBox();
+            }
+        }
+
+        private void clearLogBtn_Click(object sender, EventArgs e)
+        {
+            Server.Log.DeleteFile();
+        }
+
+        private void updateLogTimer_Tick(object sender, EventArgs e)
+        {
+            RefreshLogBox();
+        }
+
+        private void testWriteBtn_Click(object sender, EventArgs e)
+        {
+            Server.Log.Info("Test info.");
+            Server.Log.Action("Test action.");
+            Server.Log.Error("Test error.");
+            RefreshLogBox();
+        }
+
+        private void refreshBtn_Click(object sender, EventArgs e)
+        {
+            RefreshLogBox();
+        }
+
+        private void logAutoUpdate_CheckedChanged(object sender, EventArgs e)
+        {
+            updateLogTimer.Enabled = logAutoUpdate.Checked;
         }
     }
 }

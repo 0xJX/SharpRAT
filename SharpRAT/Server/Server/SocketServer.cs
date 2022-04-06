@@ -19,7 +19,7 @@ namespace Server.Server
             public StringBuilder dataStringBuilder = new StringBuilder();
         }
 
-        public Client GetClient(int index)
+        public static Client GetClient(int index)
         {
             try
             {
@@ -147,12 +147,12 @@ namespace Server.Server
             Main.uiRequests.Request("Connection accepted.", RequestUI.RequestType.UI_UPDATE_STATUS);
         }
 
-        public void Send(Socket handler, string data)
+        public IAsyncResult Send(Socket handler, string data)
         {
             // Convert the string data to byte data using ASCII encoding.
             byte[] byteData = Encoding.ASCII.GetBytes(data);
             // Begin sending the data to the remote device.
-            handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+            return handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
         }
 
         private static void SendCallback(IAsyncResult ar)
@@ -167,13 +167,13 @@ namespace Server.Server
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Log.Error(e.Message);
             }
         }
 
         public void ExecuteServer()
         {
-            Logging.Info("starting server", "log");
+            Log.Info("Started SocketServer.");
             // Ping clients on background thread.
             Thread checkClientsThread = new Thread(CheckClientsThread);
             checkClientsThread.IsBackground = true;
@@ -204,7 +204,7 @@ namespace Server.Server
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Log.Error(e.Message);
                 }
                 Thread.Sleep(100);
             }

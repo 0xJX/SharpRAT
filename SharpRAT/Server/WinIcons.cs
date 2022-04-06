@@ -8,6 +8,7 @@ namespace Server
         public enum ShellID // https://help4windows.com/windows_8_shell32_dll.shtml
         {
             Shutdown_ICO = 27,
+            FileSearch_ICO = 55,
             Config_ICO = 69,
             Keychain_ICO = 104,
             Question_ICO = 154,

