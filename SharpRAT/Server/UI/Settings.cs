@@ -4,6 +4,13 @@ namespace Server.UI
 {
     public partial class Settings : Form
     {
+        enum FormEffect
+        {
+            LAUNCH,
+            CLOSING
+        }
+
+        private FormEffect formEffect = FormEffect.LAUNCH;
         private readonly ImageList tabImages;
         public Settings()
         {
@@ -40,6 +47,9 @@ namespace Server.UI
 
         private void Settings_Load(object sender, EventArgs e)
         {
+            Width = 0;
+            Height = 0;
+            portNumericUD.Value = User.Config.iPortNumber;
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Config_ICO, false));
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FileSearch_ICO, false));
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info_ICO, false));
@@ -96,6 +106,52 @@ namespace Server.UI
         private void logAutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
             updateLogTimer.Enabled = logAutoUpdate.Checked;
+        }
+
+        private void portNumericUD_ValueChanged(object sender, EventArgs e)
+        {
+            User.Config.iPortNumber = (int)portNumericUD.Value;
+        }
+
+        private void Settings_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            User.Config.Write();
+        }
+
+        private void formEffectTimer_Tick(object sender, EventArgs e)
+        {
+            switch(formEffect)
+            {
+                case FormEffect.LAUNCH:
+                    if (Width < 605)
+                        Width += 25;
+
+                    if (Height < 445)
+                        Height += 25;
+
+                    if (Height >= 445 && Width >= 605)
+                        formEffectTimer.Stop();
+                    break;
+                case FormEffect.CLOSING:
+                    if (Width != 0)
+                        Width -= 25;
+
+                    if(Height != 0)
+                        Height -= 25;
+
+                    if (Height < 45 && Width < 45)
+                        Close();
+                    break;
+            }
+        }
+
+        private void Settings_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (formEffect == FormEffect.LAUNCH)
+                e.Cancel = true;
+
+            formEffect = FormEffect.CLOSING;
+            formEffectTimer.Start();
         }
     }
 }

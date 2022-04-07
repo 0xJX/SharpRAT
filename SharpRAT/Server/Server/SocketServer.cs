@@ -184,7 +184,7 @@ namespace Server.Server
                 // Start the server at localhost, port 11111
                 IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
                 IPAddress ipAddress = ipHost.AddressList[0];
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11111);
+                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, User.Config.iPortNumber);
 
                 // Creation TCP/IP Socket using
                 // Socket Class Constructor

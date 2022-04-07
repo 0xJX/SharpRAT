@@ -32,6 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
             this.tabControl = new System.Windows.Forms.TabControl();
             this.mainPage = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.portNumericUD = new System.Windows.Forms.NumericUpDown();
             this.logPage = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.refreshBtn = new System.Windows.Forms.Button();
@@ -50,7 +53,11 @@
             this.imgBox = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.updateLogTimer = new System.Windows.Forms.Timer(this.components);
+            this.formEffectTimer = new System.Windows.Forms.Timer(this.components);
             this.tabControl.SuspendLayout();
+            this.mainPage.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.portNumericUD)).BeginInit();
             this.logPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.aboutPage.SuspendLayout();
@@ -76,6 +83,7 @@
             // 
             // mainPage
             // 
+            this.mainPage.Controls.Add(this.groupBox2);
             this.mainPage.Location = new System.Drawing.Point(4, 24);
             this.mainPage.Name = "mainPage";
             this.mainPage.Padding = new System.Windows.Forms.Padding(3);
@@ -83,6 +91,49 @@
             this.mainPage.TabIndex = 0;
             this.mainPage.Text = "Main";
             this.mainPage.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.portNumericUD);
+            this.groupBox2.Location = new System.Drawing.Point(6, 6);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(255, 49);
+            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Server settings";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(34, 21);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(32, 15);
+            this.label4.TabIndex = 1;
+            this.label4.Text = "Port:";
+            // 
+            // portNumericUD
+            // 
+            this.portNumericUD.Location = new System.Drawing.Point(70, 19);
+            this.portNumericUD.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.portNumericUD.Minimum = new decimal(new int[] {
+            1025,
+            0,
+            0,
+            0});
+            this.portNumericUD.Name = "portNumericUD";
+            this.portNumericUD.Size = new System.Drawing.Size(179, 23);
+            this.portNumericUD.TabIndex = 0;
+            this.portNumericUD.Value = new decimal(new int[] {
+            1025,
+            0,
+            0,
+            0});
+            this.portNumericUD.ValueChanged += new System.EventHandler(this.portNumericUD_ValueChanged);
             // 
             // logPage
             // 
@@ -291,6 +342,12 @@
             this.updateLogTimer.Interval = 500;
             this.updateLogTimer.Tick += new System.EventHandler(this.updateLogTimer_Tick);
             // 
+            // formEffectTimer
+            // 
+            this.formEffectTimer.Enabled = true;
+            this.formEffectTimer.Interval = 1;
+            this.formEffectTimer.Tick += new System.EventHandler(this.formEffectTimer_Tick);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -306,8 +363,14 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SharpRAT - Settings";
             this.TopMost = true;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Settings_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Settings_FormClosed);
             this.Load += new System.EventHandler(this.Settings_Load);
             this.tabControl.ResumeLayout(false);
+            this.mainPage.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.portNumericUD)).EndInit();
             this.logPage.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -344,5 +407,9 @@
         private Button testWriteBtn;
         private Button refreshBtn;
         private CheckBox logAutoUpdate;
+        private GroupBox groupBox2;
+        private Label label4;
+        private NumericUpDown portNumericUD;
+        private System.Windows.Forms.Timer formEffectTimer;
     }
 }
