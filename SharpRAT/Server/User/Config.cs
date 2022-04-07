@@ -9,6 +9,8 @@ namespace Server.User
     public static class Config
     {
         public static int iPortNumber = 11111;
+        public static bool bRunServer = true;
+
         public static string GetConfigPath()
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\Server.cfg";
@@ -29,12 +31,12 @@ namespace Server.User
             if (!line.StartsWith(varStructure))
                 return bValue;
 
-            return Convert.ToBoolean(int.Parse(line.Split(varStructure)[1]));
+            return line.Split(varStructure)[1].StartsWith("True");
         }
 
         private static void WriteVariable(StreamWriter sw, string varName, string varWrite)
         {
-            sw.Write("-" + varName + ":" + varWrite);
+            sw.WriteLine("-" + varName + ":" + varWrite);
         }
 
         public static void Read()
@@ -47,6 +49,7 @@ namespace Server.User
                     while ((line = sr.ReadLine()) != null)
                     {
                         iPortNumber = Parse(line, "iPortNumber", iPortNumber);
+                        bRunServer = Parse(line, "bRunServer", bRunServer);
                     }
                 }
             }
@@ -63,6 +66,7 @@ namespace Server.User
                 using (StreamWriter sw = new StreamWriter(GetConfigPath(), false))
                 {
                     WriteVariable(sw, "iPortNumber", iPortNumber.ToString());
+                    WriteVariable(sw, "bRunServer", bRunServer.ToString());
                 }
             }
             catch (Exception ex)

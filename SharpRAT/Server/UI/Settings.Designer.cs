@@ -54,6 +54,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.updateLogTimer = new System.Windows.Forms.Timer(this.components);
             this.formEffectTimer = new System.Windows.Forms.Timer(this.components);
+            this.serverCheckbox = new System.Windows.Forms.CheckBox();
             this.tabControl.SuspendLayout();
             this.mainPage.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -94,11 +95,12 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.serverCheckbox);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.portNumericUD);
             this.groupBox2.Location = new System.Drawing.Point(6, 6);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(255, 49);
+            this.groupBox2.Size = new System.Drawing.Size(255, 74);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Server settings";
@@ -348,6 +350,19 @@
             this.formEffectTimer.Interval = 1;
             this.formEffectTimer.Tick += new System.EventHandler(this.formEffectTimer_Tick);
             // 
+            // serverCheckbox
+            // 
+            this.serverCheckbox.AutoSize = true;
+            this.serverCheckbox.Checked = true;
+            this.serverCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.serverCheckbox.Location = new System.Drawing.Point(166, 48);
+            this.serverCheckbox.Name = "serverCheckbox";
+            this.serverCheckbox.Size = new System.Drawing.Size(81, 19);
+            this.serverCheckbox.TabIndex = 2;
+            this.serverCheckbox.Text = "Run server";
+            this.serverCheckbox.UseVisualStyleBackColor = true;
+            this.serverCheckbox.CheckedChanged += new System.EventHandler(this.serverCheckbox_CheckedChanged);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -411,5 +426,6 @@
         private Label label4;
         private NumericUpDown portNumericUD;
         private System.Windows.Forms.Timer formEffectTimer;
+        private CheckBox serverCheckbox;
     }
 }

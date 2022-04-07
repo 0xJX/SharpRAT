@@ -6,7 +6,7 @@ namespace Server
     {
         private string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT";
         private readonly ImageList imageList;
-        public readonly SocketServer socketServer;
+        public static SocketServer socketServer;
         public static RequestUI uiRequests;
 
         public Main()
@@ -87,11 +87,8 @@ namespace Server
 
             LoadImagesForUI();
 
-            // Start the server on it's own thread, so it does not hog all the UI resources.
-            Thread serverThread = new Thread(socketServer.ExecuteServer);
-            serverThread.IsBackground = true;
-            serverThread.Start();
-            UpdateStatus("Server started");
+            if(User.Config.bRunServer)
+                socketServer.StartServer();
         }
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)

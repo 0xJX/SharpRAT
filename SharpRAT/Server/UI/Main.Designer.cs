@@ -142,7 +142,7 @@
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -157,9 +157,9 @@
             this.statusLbl.AutoSize = true;
             this.statusLbl.Location = new System.Drawing.Point(9, 431);
             this.statusLbl.Name = "statusLbl";
-            this.statusLbl.Size = new System.Drawing.Size(50, 15);
+            this.statusLbl.Size = new System.Drawing.Size(157, 15);
             this.statusLbl.TabIndex = 9;
-            this.statusLbl.Text = "Status: -";
+            this.statusLbl.Text = "Status: Server is not running.";
             // 
             // Main
             // 

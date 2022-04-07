@@ -50,6 +50,7 @@ namespace Server.UI
             Width = 0;
             Height = 0;
             portNumericUD.Value = User.Config.iPortNumber;
+            serverCheckbox.Checked = User.Config.bRunServer;
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Config_ICO, false));
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FileSearch_ICO, false));
             tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info_ICO, false));
@@ -152,6 +153,16 @@ namespace Server.UI
 
             formEffect = FormEffect.CLOSING;
             formEffectTimer.Start();
+        }
+
+        private void serverCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            User.Config.bRunServer = serverCheckbox.Checked;
+            Thread.Sleep(100);
+            if (User.Config.bRunServer)
+                Main.socketServer.StartServer();
+            else
+                Main.socketServer.SuspendServer();
         }
     }
 }
