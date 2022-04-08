@@ -6,6 +6,7 @@ namespace Server.Server
 {
     public partial class SocketServer
     {
+        private Thread serverThread, checkClientsThread;
         private static List<Client> clients = new List<Client>();
         const int
             iMaxConnectedUsers = 100,
@@ -33,7 +34,7 @@ namespace Server.Server
 
         public void CheckClientsThread()
         {
-            while (true)
+            while (User.Config.bRunServer)
             {
                 try
                 {
@@ -55,9 +56,14 @@ namespace Server.Server
                         clients.Remove(GetClient(i));
                         Main.uiRequests.Request(i.ToString(), RequestUI.RequestType.UI_REMOVE_USER);
                     }
-                }catch (Exception e)
+                }
+                catch (SocketException e)
                 {
-                    Console.WriteLine(e.Message);
+                    // Normal stuff.
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Server: " + e.Message);
                 }
                 Thread.Sleep(100);
             }
@@ -139,11 +145,9 @@ namespace Server.Server
         {
             // Get the socket that handles the client request.
             Socket listener = (Socket)ar.AsyncState;
-            Socket handler = listener.EndAccept(ar);
-
             clients.Add(new Client());
-            clients.Last().socket = handler;
-            handler.BeginReceive(clients.Last().buffer, 0, 1024, 0, new AsyncCallback(ReadCallback), clients.Last());
+            clients.Last().socket = listener.EndAccept(ar);
+            clients.Last().socket.BeginReceive(clients.Last().buffer, 0, 1024, 0, new AsyncCallback(ReadCallback), clients.Last());
             Main.uiRequests.Request("Connection accepted.", RequestUI.RequestType.UI_UPDATE_STATUS);
         }
 
@@ -167,24 +171,20 @@ namespace Server.Server
             }
             catch (Exception e)
             {
-                Log.Error(e.Message);
+                Log.Error("SendCallback: " + e.Message);
             }
         }
 
         public void ExecuteServer()
         {
             Log.Info("Started SocketServer.");
-            // Ping clients on background thread.
-            Thread checkClientsThread = new Thread(CheckClientsThread);
-            checkClientsThread.IsBackground = true;
-            checkClientsThread.Start();
 
-            while (true)
+            while (User.Config.bRunServer)
             {
                 // Start the server at localhost, port 11111
                 IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
                 IPAddress ipAddress = ipHost.AddressList[0];
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11111);
+                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, User.Config.iPortNumber);
 
                 // Creation TCP/IP Socket using
                 // Socket Class Constructor
@@ -196,7 +196,7 @@ namespace Server.Server
                     listener.Listen(iMaxConnectedUsers);
                     Main.uiRequests.Request("Waiting for connections...", RequestUI.RequestType.UI_UPDATE_STATUS);
 
-                    while (true)
+                    while (User.Config.bRunServer)
                     {
                         listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
                         Thread.Sleep(100); // Sleep, so the thread doesn't hog all the memory.
@@ -204,9 +204,54 @@ namespace Server.Server
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.Message);
+                    Log.Error("Execute Server: " + e.Message);
                 }
                 Thread.Sleep(100);
+            }
+        }
+
+        public void StartServer()
+        {
+            // Start the server on it's own thread, so it does not hog all the UI resources.
+            serverThread = new Thread(ExecuteServer);
+            if (serverThread.ThreadState != ThreadState.Running)
+            {
+                serverThread.IsBackground = true;
+                serverThread.Start();
+                Main.uiRequests.Request("Server started", RequestUI.RequestType.UI_UPDATE_STATUS);
+            }
+
+            // Ping clients on background thread.
+            checkClientsThread = new Thread(CheckClientsThread);
+            if (checkClientsThread.ThreadState != ThreadState.Running)
+            {
+                checkClientsThread.IsBackground = true;
+                checkClientsThread.Start();
+            }
+        }
+
+        public void SuspendServer()
+        {
+            try
+            {
+                for (int i = 0; i < clients.Count; i++)
+                {
+                    // No clients.
+                    if (clients.Count == 0)
+                        break;
+
+                    // Socket was valid, continue on the list.
+                    if (GetClient(i).socket.Connected)
+                    {
+                        GetClient(i).socket.Disconnect(false);
+                        clients.Remove(GetClient(i));
+                        Main.uiRequests.Request(i.ToString(), RequestUI.RequestType.UI_REMOVE_USER);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
             }
         }
     }

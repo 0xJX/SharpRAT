@@ -79,7 +79,7 @@ namespace Client.Client
                         bNameSent = SendName();
                     try
                     {
-                        while (serverSocket.Connected)
+                        while (GetServerSocket().Connected)
                         {
                             // Data buffer
                             byte[] messageReceived = new byte[1024];
@@ -92,7 +92,7 @@ namespace Client.Client
                         Console.WriteLine(e.Message);
                     }
 
-                    if (!serverSocket.Connected)
+                    if (!GetServerSocket().Connected)
                         bNameSent = false;
                 }
                 catch (Exception e)

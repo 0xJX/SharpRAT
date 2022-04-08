@@ -4,11 +4,10 @@ namespace Server
 {
     public partial class Main : Form
     {
+        private string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT";
         private readonly ImageList imageList;
-        public readonly SocketServer socketServer;
-        #pragma warning disable CS8618
-            public static RequestUI uiRequests;
-#pragma warning restore CS8618
+        public static SocketServer socketServer;
+        public static RequestUI uiRequests;
 
         public Main()
         {
@@ -16,8 +15,8 @@ namespace Server
             uiRequests = new RequestUI();
             imageList = new ImageList();
             InitializeComponent();
-
         }
+
         private void AddUserToViewlist(string text)
         {
             // Parse text
@@ -78,17 +77,18 @@ namespace Server
 
         private void Main_Load(object sender, EventArgs e)
         {
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT"))
-            {
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\");
-            }
+            // Create directory if it does not exist.
+            if (!File.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            // Load config values if the config exists.
+            if (File.Exists(User.Config.GetConfigPath()))
+                User.Config.Read();
+
             LoadImagesForUI();
 
-            // Start the server on it's own thread, so it does not hog all the UI resources.
-            Thread serverThread = new Thread(socketServer.ExecuteServer);
-            serverThread.IsBackground = true;
-            serverThread.Start();
-            UpdateStatus("Server started");
+            if(User.Config.bRunServer)
+                socketServer.StartServer();
         }
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
