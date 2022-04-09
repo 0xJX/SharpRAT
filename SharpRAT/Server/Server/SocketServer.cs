@@ -96,7 +96,7 @@ namespace Server.Server
 
             if (tempString.StartsWith("<SCREENSHOT>"))
             {
-                trreadimage(data);
+                Readimage(data);
             }
 
             if (tempString.StartsWith("<CMD=NAME>"))
@@ -180,15 +180,14 @@ namespace Server.Server
             }
         }
 
-        public static void trreadimage(string data)
+        public static void Readimage(string data)
         {
-            byte[] bx = new byte[1024 * 10000];
             try
             {
                 data = data.Replace("<SCREENSHOT>", "");
                 data = data.Replace("<EOF>", "");
                 //clientSocket.Receive(dataSize);
-                bx = Convert.FromBase64String(data);
+                byte[] bx = Convert.FromBase64String(data);
                 if (bx.Length > 0)
                 {
                     //string base64 = Convert.ToBase64String(dataSize);
