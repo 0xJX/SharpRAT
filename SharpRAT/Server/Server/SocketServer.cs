@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Diagnostics;
 
 namespace Server.Server
 {
@@ -117,7 +118,7 @@ namespace Server.Server
             {
                 // There  might be more data, so store the data received so far.
                 client.dataStringBuilder.Append(Encoding.ASCII.GetString(client.buffer, 0, bytesRead));
-
+                
                 // Check for end-of-file tag. If it is not there, read more data.
                 string data = client.dataStringBuilder.ToString();
                 if (data.IndexOf("<EOF>") > -1)
@@ -171,6 +172,38 @@ namespace Server.Server
             }
         }
 
+        public void trreadimage(Socket clientSocket)
+        {
+            byte[] dataSize = new byte[1024 * 10000];
+            try
+            {
+                string imageName = @$"C\Temp\image-" + System.DateTime.Now.Ticks + ".JPG";
+                Send(clientSocket, "<SCREENSHOT>");
+                byte[] b = new byte[1024 * 10000];  
+                clientSocket.Receive(dataSize);
+
+                if (dataSize.Length > 0)
+                {
+                    string base64 = Convert.ToBase64String(dataSize);
+                    base64 = base64.Replace("<SCREENSHOT>", "");
+                    base64 = base64.Replace("<EOF>", "");
+                    byte[] bx = Convert.FromBase64String(base64);
+
+                    MemoryStream ms = new MemoryStream(bx);
+                    Image img = Image.FromStream(ms);
+                    img.Save(imageName, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    
+                    ms.Close();
+                    Debug.WriteLine("3");
+                }
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show(ee.Message);
+                //thread.Abort();
+            }
+
+        }
         public void ExecuteServer()
         {
             Log.Info("Started SocketServer.");
@@ -178,7 +211,6 @@ namespace Server.Server
             Thread checkClientsThread = new Thread(CheckClientsThread);
             checkClientsThread.IsBackground = true;
             checkClientsThread.Start();
-
             while (true)
             {
                 // Start the server at localhost, port 11111

