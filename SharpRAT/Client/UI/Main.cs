@@ -3,7 +3,7 @@ namespace Client
 {
     public partial class Main : Form
     {
-        private readonly Client.SocketClient socketClient;
+        public static Client.SocketClient socketClient;
         public static RequestUI uiRequests;
         public Main()
         {

@@ -7,7 +7,7 @@ namespace Server.Server
     public partial class SocketServer
     {
         private Thread serverThread, checkClientsThread;
-        private static List<Client> clients = new List<Client>();
+        private readonly static List<Client> clients = new();
         const int
             iMaxConnectedUsers = 100,
             iPingWaitTime = 1000;
@@ -17,7 +17,7 @@ namespace Server.Server
             public Socket socket;
             public byte[] buffer = new byte[1024];
             // Received data string.
-            public StringBuilder dataStringBuilder = new StringBuilder();
+            public StringBuilder dataStringBuilder = new();
         }
 
         public static Client GetClient(int index)
@@ -78,12 +78,12 @@ namespace Server.Server
                 Thread.Sleep(iPingWaitTime);
                 clientSocket.Receive(buffer);
             }
-            catch(SocketException)
+            catch (SocketException)
             {
                 return false; // Connection failed.
             }
 
-            if(buffer.Length > 0)
+            if (buffer.Length > 0)
             {
                 string decoded = Encoding.ASCII.GetString(buffer);
                 if (decoded.StartsWith("<PING>"))
@@ -97,12 +97,12 @@ namespace Server.Server
         {
             string tempString = data.Replace("<EOF>", "");
 
-            if(tempString.StartsWith("<CMD=NAME>"))
+            if (tempString.StartsWith("<CMD=NAME>"))
             {
                 tempString = tempString.Replace("<CMD=NAME>", "");
 
                 // Add received name, ip:port to our UI.
-                tempString += "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString() 
+                tempString += "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString()
                 + "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Port.ToString();
 
                 Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_ADD_USER);
@@ -154,7 +154,7 @@ namespace Server.Server
         public IAsyncResult Send(Socket handler, string data)
         {
             // Convert the string data to byte data using ASCII encoding.
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
+            byte[] byteData = Encoding.ASCII.GetBytes(data + "<EOF>");
             // Begin sending the data to the remote device.
             return handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
         }
