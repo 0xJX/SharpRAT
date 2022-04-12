@@ -143,5 +143,10 @@ namespace Server
             UI.Settings settings = new UI.Settings();
             settings.ShowDialog();
         }
+
+        private void ScreenshotMenuItem_Click(object sender, EventArgs e)
+        {
+            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SCREENSHOT>" + "<EOF>");
+        }
     }
 }

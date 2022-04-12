@@ -15,7 +15,7 @@ namespace Server.Server
         public class Client
         {
             public Socket socket;
-            public byte[] buffer = new byte[1024];
+            public byte[] buffer = new byte[1024*10000];
             // Received data string.
             public StringBuilder dataStringBuilder = new StringBuilder();
         }
@@ -71,7 +71,6 @@ namespace Server.Server
             {
                 Send(clientSocket, "<PING>");
 
-                Send(clientSocket, "<SCREENSHOT>");
                 Thread.Sleep(iPingWaitTime);
                 clientSocket.Receive(buffer);
             }
@@ -92,17 +91,20 @@ namespace Server.Server
 
         public static void ParseData(Socket clientSocket, string data)
         {
+            Debug.WriteLine("starting data parsing");
             string tempString = data.Replace("<EOF>", "");
-
+            Debug.WriteLine($"{data}");
             if (tempString.StartsWith("<SCREENSHOT>"))
             {
+                Debug.WriteLine("string started with screenshot");
                 Readimage(data);
             }
 
-            if (tempString.StartsWith("<CMD=NAME>"))
+            else if (tempString.StartsWith("<CMD=NAME>"))
             {
+                Debug.WriteLine("string started with cmd name, adding user");
                 tempString = tempString.Replace("<CMD=NAME>", "");
-
+                
                 // Add received name, ip:port to our UI.
                 tempString += "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString() 
                 + "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Port.ToString();
@@ -184,6 +186,7 @@ namespace Server.Server
         {
             try
             {
+                Debug.WriteLine("screenshot read function started");
                 data = data.Replace("<SCREENSHOT>", "");
                 data = data.Replace("<EOF>", "");
                 //clientSocket.Receive(dataSize);
@@ -200,7 +203,7 @@ namespace Server.Server
                     img.Save(imageName, System.Drawing.Imaging.ImageFormat.Jpeg);
 
                     ms.Close();
-                    Debug.WriteLine("3");
+                    Debug.WriteLine("screenshot retrieved successfully");
                 }
             }
             catch (Exception e)
@@ -217,6 +220,7 @@ namespace Server.Server
             Thread checkClientsThread = new Thread(CheckClientsThread);
             checkClientsThread.IsBackground = true;
             checkClientsThread.Start();
+
             while (true)
             {
                 // Start the server at localhost, port 11111
@@ -227,7 +231,7 @@ namespace Server.Server
                 // Creation TCP/IP Socket using
                 // Socket Class Constructor
                 Socket listener = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
+                
                 try
                 {
                     listener.Bind(localEndPoint);

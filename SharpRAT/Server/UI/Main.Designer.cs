@@ -39,6 +39,7 @@
             this.userControlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableTaskmanagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shutdownClientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ScreenshotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -100,7 +101,8 @@
             // 
             this.userControlToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.disableTaskmanagerToolStripMenuItem,
-            this.shutdownClientToolStripMenuItem});
+            this.shutdownClientToolStripMenuItem,
+            this.ScreenshotToolStripMenuItem});
             this.userControlToolStripMenuItem.Name = "userControlToolStripMenuItem";
             this.userControlToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.userControlToolStripMenuItem.Text = "User Control";
@@ -119,6 +121,13 @@
             this.shutdownClientToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.shutdownClientToolStripMenuItem.Text = "Shutdown SharpRAT client";
             this.shutdownClientToolStripMenuItem.Click += new System.EventHandler(this.shutdownClientToolStripMenuItem_Click);
+            // 
+            // ScreenshotToolStripMenuItem
+            // 
+            this.ScreenshotToolStripMenuItem.Name = "ScreenshotToolStripMenuItem";
+            this.ScreenshotToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.ScreenshotToolStripMenuItem.Text = "Take a Screenshot";
+            this.ScreenshotToolStripMenuItem.Click += new System.EventHandler(this.ScreenshotMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -202,5 +211,6 @@
         private ToolStripMenuItem disableTaskmanagerToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem shutdownClientToolStripMenuItem;
+        private ToolStripMenuItem ScreenshotToolStripMenuItem;
     }
 }
