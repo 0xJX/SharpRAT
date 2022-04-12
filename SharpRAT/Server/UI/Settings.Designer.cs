@@ -33,6 +33,7 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.mainPage = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.serverCheckbox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.portNumericUD = new System.Windows.Forms.NumericUpDown();
             this.logPage = new System.Windows.Forms.TabPage();
@@ -54,7 +55,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.updateLogTimer = new System.Windows.Forms.Timer(this.components);
             this.formEffectTimer = new System.Windows.Forms.Timer(this.components);
-            this.serverCheckbox = new System.Windows.Forms.CheckBox();
             this.tabControl.SuspendLayout();
             this.mainPage.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -104,6 +104,19 @@
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Server settings";
+            // 
+            // serverCheckbox
+            // 
+            this.serverCheckbox.AutoSize = true;
+            this.serverCheckbox.Checked = true;
+            this.serverCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.serverCheckbox.Location = new System.Drawing.Point(166, 48);
+            this.serverCheckbox.Name = "serverCheckbox";
+            this.serverCheckbox.Size = new System.Drawing.Size(81, 19);
+            this.serverCheckbox.TabIndex = 2;
+            this.serverCheckbox.Text = "Run server";
+            this.serverCheckbox.UseVisualStyleBackColor = true;
+            this.serverCheckbox.CheckedChanged += new System.EventHandler(this.serverCheckbox_CheckedChanged);
             // 
             // label4
             // 
@@ -349,19 +362,6 @@
             this.formEffectTimer.Enabled = true;
             this.formEffectTimer.Interval = 1;
             this.formEffectTimer.Tick += new System.EventHandler(this.formEffectTimer_Tick);
-            // 
-            // serverCheckbox
-            // 
-            this.serverCheckbox.AutoSize = true;
-            this.serverCheckbox.Checked = true;
-            this.serverCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.serverCheckbox.Location = new System.Drawing.Point(166, 48);
-            this.serverCheckbox.Name = "serverCheckbox";
-            this.serverCheckbox.Size = new System.Drawing.Size(81, 19);
-            this.serverCheckbox.TabIndex = 2;
-            this.serverCheckbox.Text = "Run server";
-            this.serverCheckbox.UseVisualStyleBackColor = true;
-            this.serverCheckbox.CheckedChanged += new System.EventHandler(this.serverCheckbox_CheckedChanged);
             // 
             // Settings
             // 

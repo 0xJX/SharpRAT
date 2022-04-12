@@ -51,9 +51,9 @@ namespace Server.UI
             Height = 0;
             portNumericUD.Value = User.Config.iPortNumber;
             serverCheckbox.Checked = User.Config.bRunServer;
-            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Config_ICO, false));
-            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FileSearch_ICO, false));
-            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info_ICO, false));
+            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Config, false));
+            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FileSearch, false));
+            tabImages.Images.Add(WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info, false));
             tabImages.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             tabControl.ImageList = tabImages;
 
@@ -83,7 +83,8 @@ namespace Server.UI
 
         private void clearLogBtn_Click(object sender, EventArgs e)
         {
-            Server.Log.DeleteFile();
+            if(Server.Log.DeleteFile())
+                RefreshLogBox();
         }
 
         private void updateLogTimer_Tick(object sender, EventArgs e)
@@ -148,7 +149,7 @@ namespace Server.UI
 
         private void Settings_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (formEffect == FormEffect.LAUNCH)
+            if ((formEffect == FormEffect.LAUNCH) && WindowState != FormWindowState.Maximized)
                 e.Cancel = true;
 
             formEffect = FormEffect.CLOSING;
