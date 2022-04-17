@@ -1,14 +1,23 @@
 ﻿
+using Server.Server;
+using System.Net.Sockets;
+
 namespace Server.UI
 {
     public partial class FileManager : Form
     {
-        private string currentPath = @"C:\";
+        private static List<string> fileStringList = new();
+        private static bool
+            updateUi = false;
+        private string currentPath = "";
         private readonly ImageList imageList;
-        public FileManager()
+        private Socket client;
+
+        public FileManager(int clientIndex)
         {
             imageList = new ImageList();
             InitializeComponent();
+            client = SocketServer.GetClient(clientIndex).socket;
         }
 
         private enum FileType
@@ -78,40 +87,6 @@ namespace Server.UI
             }
         }
 
-        private FileType GetFileType(string path)
-        {
-            string extension = Path.GetExtension(path);
-            switch(extension)
-            {
-                case ".txt":
-                case ".log":
-                case ".cfg":
-                    return FileType.TEXT_DOCUMENT;
-                case ".exe":
-                    return FileType.EXECUTABLE;
-                case ".dll":
-                    return FileType.DLL;
-                case ".jpg":
-                case ".png":
-                case ".jpeg":
-                case ".bmp":
-                case ".webp":
-                case ".gif":
-                case ".apng":
-                    return FileType.IMAGE;
-                case ".mp4":
-                case ".mov":
-                case ".mkv":
-                case ".flv":
-                case ".webm":
-                case ".wmv":
-                case ".avi":
-                    return FileType.VIDEO;
-                default:
-                    return FileType.FILE;
-            }
-        }
-
         private Bitmap GetFileIcon(FileType type)
         {
             switch (type)
@@ -152,62 +127,35 @@ namespace Server.UI
             fileListView.Items.Add(fileViewItem);
         }
 
-        private void LoadDirectories()
-        {
-            fileListView.Items.Clear();
-            pathBox.Text = currentPath;
-            try
-            {
-                AddFileToList("...", "", FileType.FILE_FOLDER, 0);
-                foreach (string file in Directory.GetDirectories(currentPath))
-                {
-                    string finalFileName = file.Replace(currentPath, "");
-                    if (finalFileName.StartsWith(@"\"))
-                        finalFileName = finalFileName.Remove(0, 1);
-
-                    string lastModified = Directory.GetLastWriteTime(currentPath + @"\" + finalFileName).ToString();
-                    AddFileToList(finalFileName, lastModified, FileType.FILE_FOLDER, 0);
-                }
-                LoadFiles();
-            }
-            catch (Exception ex)
-            {
-                Server.Log.Error(ex.Message);
-            }
-        }
-
-        private void LoadFiles()
-        {
-            foreach (string file in Directory.GetFiles(currentPath))
-            {
-                string finalFileName = file.Replace(currentPath, "");
-                if (finalFileName.StartsWith(@"\"))
-                    finalFileName = finalFileName.Remove(0, 1);
-
-                long fileSize = new FileInfo(currentPath + @"\" + finalFileName).Length;
-                string lastModified = File.GetLastWriteTime(currentPath + @"\" + finalFileName).ToString();
-
-                AddFileToList(finalFileName, lastModified, GetFileType(finalFileName), fileSize);
-            }
-        }
-
-        private void LoadDrives()
-        {
-            fileListView.Items.Clear();
-            foreach (DriveInfo d in DriveInfo.GetDrives())
-            {
-                if (d.IsReady == true)
-                {
-                    string driveName = d.Name;
-                    //driveName = driveName.Replace(@"\", "");
-                    AddFileToList(driveName, "", FileType.DRIVE, (d.TotalSize - d.AvailableFreeSpace));
-                }
-            }
-        }
-
         private void FileManager_Load(object sender, EventArgs e)
         {
-            LoadDirectories();
+            RequestDrives();
+        }
+
+        private void RequestDrives()
+        {
+            fileListView.Items.Clear();
+            Main.socketServer.Send(client, "<REQUEST-DRIVES>");
+        }
+
+        private void RequestDirectories()
+        {
+            fileListView.Items.Clear();
+            Main.socketServer.Send(client, "<REQUEST-DIRS>" + currentPath);
+            pathBox.Text = currentPath;
+        }
+
+        public static void ReceiveData(string fileData)
+        {
+            string[] fileDatas = fileData.Split("<FILE-END>");
+
+            if (fileDatas == null)
+                return;
+
+            for (int i = 0; i < fileDatas.Count() - 1; i++)
+                fileStringList.Add(fileDatas[i]);
+
+            updateUi = true;
         }
 
         private void fileListView_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -219,7 +167,7 @@ namespace Server.UI
                 if(currentPath.Length <= 3 && fileListView.SelectedItems[0].Text.Equals("..."))
                 {
                     currentPath = "";
-                    LoadDrives();
+                    RequestDrives();
                     return;
                 }
                 else if(fileListView.SelectedItems[0].Index == 0 && fileListView.SelectedItems[0].Text.Equals("..."))
@@ -239,20 +187,20 @@ namespace Server.UI
                             if (currentPath.Length <= 3)
                             {
                                 currentPath = "";
-                                LoadDrives();
+                                RequestDrives();
                                 return;
                             }
                             else
                             {
                                 currentPath = pathFolders[0] + @"\";
-                                LoadDirectories();
+                                RequestDirectories();
                                 return;
                             }
                         }
                     }
 
                     currentPath = newPath;
-                    LoadDirectories();
+                    RequestDirectories();
                 }
                 else if(Path.GetExtension(currentPath + selectedFile).Length > 0)
                 {
@@ -265,9 +213,33 @@ namespace Server.UI
                     currentPath = currentPath + selectedFile;
                     if (currentPath.Contains(@":\\"))
                         currentPath = currentPath.Replace(@":\\", @":\");
-                    LoadDirectories();
+                    RequestDirectories();
                 }
             }
+        }
+        
+        private void AddDataToView(string fileData)
+        {
+            string[] splitData = fileData.Split("<SPLIT>");
+            string
+                name = splitData[0],
+                dateModified = splitData[1];
+            FileType type = (FileType)int.Parse(splitData[2]);
+            long size = long.Parse(splitData[3]);
+
+            AddFileToList(name, dateModified, type, size);
+        }
+
+        private void uiUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (!updateUi)
+                return;
+
+            foreach (string file in fileStringList)
+                AddDataToView(file);
+
+            fileStringList.Clear();
+            updateUi = false;
         }
     }
 }

@@ -147,7 +147,7 @@ namespace Server
 
         private void fileManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UI.FileManager fileManager = new();
+            UI.FileManager fileManager = new(userView.SelectedItems[0].Index);
             fileManager.ShowDialog();
         }
     }

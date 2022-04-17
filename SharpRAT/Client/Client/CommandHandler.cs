@@ -45,6 +45,17 @@ namespace Client.Client
                 Main.socketClient.GetServerSocket().Close();
                 Application.Exit();
             }
+
+            if (tempString.StartsWith("<REQUEST-DRIVES>"))
+            {
+                FileManager.LoadDrives();
+            }
+            if (tempString.StartsWith("<REQUEST-DIRS>"))
+            {
+                tempString = tempString.Replace("<REQUEST-DIRS>", "");
+
+                FileManager.LoadDirectories(tempString);
+            }
         }
 
     }
