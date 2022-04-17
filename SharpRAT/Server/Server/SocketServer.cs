@@ -174,17 +174,24 @@ namespace Server.Server
                 Log.Error("SendCallback: " + e.Message);
             }
         }
+        public string ipgetS()
+        {
+            WebClient webClient = new WebClient();
+            string publicIp = webClient.DownloadString("https://api.ipify.org");
+            Console.WriteLine("My public IP Address is: {0}", publicIp);
+            string ip = String.Concat(publicIp.Where(c => !Char.IsWhiteSpace(c)));
+            return ip;
 
+        }
         public void ExecuteServer()
         {
             Log.Info("Started SocketServer.");
-
             while (User.Config.bRunServer)
             {
                 // Start the server at localhost, port 11111
-                IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                IPAddress ipAddress = ipHost.AddressList[0];
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, User.Config.iPortNumber);
+                //IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+                IPAddress ipAddress = IPAddress.Parse(ipgetS());
+                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11111/*User.Config.iPortNumber*/);
 
                 // Creation TCP/IP Socket using
                 // Socket Class Constructor

