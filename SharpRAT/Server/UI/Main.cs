@@ -145,16 +145,15 @@ namespace Server
             settings.ShowDialog();
         }
 
-<<<<<<< HEAD
-        private void ScreenshotMenuItem_Click(object sender, EventArgs e)
-        {
-            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SCREENSHOT>" + "<EOF>");
-=======
         private void fileManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UI.FileManager fileManager = new(userView.SelectedItems[0].Index);
             fileManager.ShowDialog();
->>>>>>> main
+        }
+
+        private void ScreenshotMenuItem_Click(object sender, EventArgs e)
+        {
+            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SCREENSHOT>" + "<EOF>");
         }
     }
 }
