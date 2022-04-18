@@ -14,8 +14,10 @@
         public enum RequestType
         {
             UI_ADD_USER = 0,
-            UI_REMOVE_USER = 1,
-            UI_UPDATE_STATUS
+            UI_REMOVE_USER,
+            UI_UPDATE_STATUS,
+            UI_UPDATE_FILES,
+            UI_UPDATE_SCREENSHOT
         }
 
         public List<RequestItem> GetRequests()
@@ -40,9 +42,17 @@
 
         public void Request(string text, RequestType requestType)
         {
-            RequestItem newRequest = new RequestItem();
+            RequestItem newRequest = new();
             newRequest.requestType = requestType;
             newRequest.szText = text;
+            newRequest.bRequest = true;
+            GetRequests().Add(newRequest);
+        }
+
+        public void Request(RequestType requestType)
+        {
+            RequestItem newRequest = new();
+            newRequest.requestType = requestType;
             newRequest.bRequest = true;
             GetRequests().Add(newRequest);
         }

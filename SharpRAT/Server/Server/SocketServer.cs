@@ -114,6 +114,11 @@ namespace Server.Server
                 data = data.Replace("<FILE>", "");
                 FileManager.ReceiveData(data);
             }
+
+            if (data.StartsWith("<PRINTSCREEN>"))
+            {
+                ScreenViewer.StartDataReceiveThread();
+            }
         }
 
         public void ReadCallback(IAsyncResult ar)

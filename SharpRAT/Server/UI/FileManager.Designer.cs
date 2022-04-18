@@ -116,6 +116,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.fileListView);
             this.Name = "FileManager";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FileManager";
             this.Load += new System.EventHandler(this.FileManager_Load);
             this.groupBox1.ResumeLayout(false);

@@ -45,6 +45,7 @@
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.statusLbl = new System.Windows.Forms.Label();
+            this.viewScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userMenuStrip.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -85,23 +86,24 @@
             // 
             this.userMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sendMessageBoxToolStripMenuItem,
+            this.viewScreenToolStripMenuItem,
             this.fileManagerToolStripMenuItem,
             this.userControlToolStripMenuItem});
             this.userMenuStrip.Name = "contextMenuStrip1";
-            this.userMenuStrip.Size = new System.Drawing.Size(170, 70);
+            this.userMenuStrip.Size = new System.Drawing.Size(181, 114);
             this.userMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.userMenuStrip_Opening);
             // 
             // sendMessageBoxToolStripMenuItem
             // 
             this.sendMessageBoxToolStripMenuItem.Name = "sendMessageBoxToolStripMenuItem";
-            this.sendMessageBoxToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.sendMessageBoxToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sendMessageBoxToolStripMenuItem.Text = "Send MessageBox";
             this.sendMessageBoxToolStripMenuItem.Click += new System.EventHandler(this.sendMessageBoxToolStripMenuItem_Click);
             // 
             // fileManagerToolStripMenuItem
             // 
             this.fileManagerToolStripMenuItem.Name = "fileManagerToolStripMenuItem";
-            this.fileManagerToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.fileManagerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.fileManagerToolStripMenuItem.Text = "File Manager";
             this.fileManagerToolStripMenuItem.Click += new System.EventHandler(this.fileManagerToolStripMenuItem_Click);
             // 
@@ -111,7 +113,7 @@
             this.disableTaskmanagerToolStripMenuItem,
             this.shutdownClientToolStripMenuItem});
             this.userControlToolStripMenuItem.Name = "userControlToolStripMenuItem";
-            this.userControlToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.userControlToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.userControlToolStripMenuItem.Text = "User Control";
             // 
             // disableTaskmanagerToolStripMenuItem
@@ -170,6 +172,13 @@
             this.statusLbl.TabIndex = 9;
             this.statusLbl.Text = "Status: Server is not running.";
             // 
+            // viewScreenToolStripMenuItem
+            // 
+            this.viewScreenToolStripMenuItem.Name = "viewScreenToolStripMenuItem";
+            this.viewScreenToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.viewScreenToolStripMenuItem.Text = "View screen";
+            this.viewScreenToolStripMenuItem.Click += new System.EventHandler(this.viewScreenToolStripMenuItem_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -211,5 +220,6 @@
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem shutdownClientToolStripMenuItem;
         private ToolStripMenuItem fileManagerToolStripMenuItem;
+        private ToolStripMenuItem viewScreenToolStripMenuItem;
     }
 }
