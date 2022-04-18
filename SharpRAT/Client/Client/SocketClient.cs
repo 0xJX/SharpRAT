@@ -7,6 +7,7 @@ namespace Client.Client
 {
     public class SocketClient
     {
+        private static int iSocketBuffer = 1048576;
         public static bool
             bShouldRun = true,
             bNameSent = false;
@@ -41,7 +42,7 @@ namespace Client.Client
                         while (GetServerSocket().Connected)
                         {
                             // Data buffer
-                            byte[] messageReceived = new byte[1024];
+                            byte[] messageReceived = new byte[iSocketBuffer];
                             int byteRecv = serverSocket.Receive(messageReceived);
                             CommandHandler.ParseData(Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
                         }

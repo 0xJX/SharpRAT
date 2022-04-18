@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.fileListView = new System.Windows.Forms.ListView();
             this.nameHeader = new System.Windows.Forms.ColumnHeader();
             this.dateModHeader = new System.Windows.Forms.ColumnHeader();
@@ -35,6 +36,7 @@
             this.sizeHeader = new System.Windows.Forms.ColumnHeader();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pathBox = new System.Windows.Forms.TextBox();
+            this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -99,6 +101,12 @@
             this.pathBox.Size = new System.Drawing.Size(764, 23);
             this.pathBox.TabIndex = 0;
             // 
+            // uiUpdateTimer
+            // 
+            this.uiUpdateTimer.Enabled = true;
+            this.uiUpdateTimer.Interval = 1;
+            this.uiUpdateTimer.Tick += new System.EventHandler(this.uiUpdateTimer_Tick);
+            // 
             // FileManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -125,5 +133,6 @@
         private ColumnHeader dateModHeader;
         private GroupBox groupBox1;
         private TextBox pathBox;
+        private System.Windows.Forms.Timer uiUpdateTimer;
     }
 }

@@ -1,21 +1,22 @@
 ﻿using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using Server.UI;
 
 namespace Server.Server
 {
     public partial class SocketServer
     {
+        private static int iSocketBuffer = 1048576;
         private Thread serverThread, checkClientsThread;
         private readonly static List<Client> clients = new();
         const int
-            iMaxConnectedUsers = 100,
-            iPingWaitTime = 1000;
+            iMaxConnectedUsers = 100;
 
         public class Client
         {
             public Socket socket;
-            public byte[] buffer = new byte[1024];
+            public byte[] buffer = new byte[iSocketBuffer];
             // Received data string.
             public StringBuilder dataStringBuilder = new();
         }
@@ -48,7 +49,7 @@ namespace Server.Server
                         if (GetClient(i).socket.Connected)
                         {
                             // Ping the client just to be sure.
-                            if (Ping(GetClient(i).socket))
+                            if (ReadClient(GetClient(i).socket))
                                 continue;
                         }
 
@@ -69,13 +70,20 @@ namespace Server.Server
             }
         }
 
-        public bool Ping(Socket clientSocket)
+        bool IsBufferEmpty(byte[] buf, int size)
         {
-            byte[] buffer = new byte[1024];
+            for (int i = 0; i < size; i++)
+                if (buf[i] != 0) 
+                    return false;
+
+            return true;
+        }
+
+        public bool ReadClient(Socket clientSocket)
+        {
+            byte[] buffer = new byte[iSocketBuffer];
             try
             {
-                Send(clientSocket, "<PING>");
-                Thread.Sleep(iPingWaitTime);
                 clientSocket.Receive(buffer);
             }
             catch (SocketException)
@@ -85,27 +93,26 @@ namespace Server.Server
 
             if (buffer.Length > 0)
             {
-                string decoded = Encoding.ASCII.GetString(buffer);
-                if (decoded.StartsWith("<PING>"))
-                    return true; // Ping succeeded.
+                if (IsBufferEmpty(buffer, iSocketBuffer))
+                    return false;
+
+                string tempString = Encoding.ASCII.GetString(buffer);
+                tempString = tempString.Split("<EOF>")[0];
+
+                ParseData(tempString);
+
+                return true; // Ping succeeded.
             }
 
-            return false;
+            return true;
         }
 
-        public static void ParseData(Socket clientSocket, string data)
+        public static void ParseData(string data)
         {
-            string tempString = data.Replace("<EOF>", "");
-
-            if (tempString.StartsWith("<CMD=NAME>"))
+            if (data.StartsWith("<FILE>"))
             {
-                tempString = tempString.Replace("<CMD=NAME>", "");
-
-                // Add received name, ip:port to our UI.
-                tempString += "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString()
-                + "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Port.ToString();
-
-                Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_ADD_USER);
+                data = data.Replace("<FILE>", "");
+                FileManager.ReceiveData(data);
             }
         }
 
@@ -128,15 +135,24 @@ namespace Server.Server
                 string data = client.dataStringBuilder.ToString();
                 if (data.IndexOf("<EOF>") > -1)
                 {
-                    // Parse received data
-                    ParseData(clientSocket, data);
-                    // Echo the data back to the client.
-                    Send(clientSocket, data);
+                    // Parse first initial received data
+                    string tempString = data.Replace("<EOF>", "");
+
+                    if (tempString.StartsWith("<CMD=NAME>"))
+                    {
+                        tempString = tempString.Replace("<CMD=NAME>", "");
+
+                        // Add received name, ip:port to our UI.
+                        tempString += "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString()
+                        + "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Port.ToString();
+
+                        Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_ADD_USER);
+                    }
                 }
                 else
                 {
                     // Not all data received. Get more.
-                    clientSocket.BeginReceive(client.buffer, 0, 1024, 0, new AsyncCallback(ReadCallback), client);
+                    clientSocket.BeginReceive(client.buffer, 0, iSocketBuffer, 0, new AsyncCallback(ReadCallback), client);
                 }
             }
         }
@@ -147,7 +163,7 @@ namespace Server.Server
             Socket listener = (Socket)ar.AsyncState;
             clients.Add(new Client());
             clients.Last().socket = listener.EndAccept(ar);
-            clients.Last().socket.BeginReceive(clients.Last().buffer, 0, 1024, 0, new AsyncCallback(ReadCallback), clients.Last());
+            clients.Last().socket.BeginReceive(clients.Last().buffer, 0, iSocketBuffer, 0, new AsyncCallback(ReadCallback), clients.Last());
             Main.uiRequests.Request("Connection accepted.", RequestUI.RequestType.UI_UPDATE_STATUS);
         }
 
