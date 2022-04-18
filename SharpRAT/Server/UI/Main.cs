@@ -70,6 +70,7 @@ namespace Server
             */
             settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Settings, false);
             sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard);
+            viewScreenToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Desktop, false);
             fileManagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FilledFolder, false);
             userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain, false);
             disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed);
@@ -149,6 +150,12 @@ namespace Server
         {
             UI.FileManager fileManager = new(userView.SelectedItems[0].Index);
             fileManager.ShowDialog();
+        }
+
+        private void viewScreenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UI.ScreenViewer screenViewer = new(userView.SelectedItems[0].Index);
+            screenViewer.ShowDialog();
         }
     }
 }

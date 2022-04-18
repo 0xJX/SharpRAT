@@ -7,11 +7,9 @@ namespace Server.UI
     public partial class FileManager : Form
     {
         private static List<string> fileStringList = new();
-        private static bool
-            updateUi = false;
         private string currentPath = "";
         private readonly ImageList imageList;
-        private Socket client;
+        private readonly Socket client;
 
         public FileManager(int clientIndex)
         {
@@ -129,17 +127,21 @@ namespace Server.UI
 
         private void FileManager_Load(object sender, EventArgs e)
         {
+            currentPath = "";
+            Icon = WinIcons.Extract("shell32.dll", (int)WinIcons.ShellID.FilledFolder, false);
             RequestDrives();
         }
 
         private void RequestDrives()
         {
+            fileListView.Enabled = false;
             fileListView.Items.Clear();
             Main.socketServer.Send(client, "<REQUEST-DRIVES>");
         }
 
         private void RequestDirectories()
         {
+            fileListView.Enabled = false;
             fileListView.Items.Clear();
             Main.socketServer.Send(client, "<REQUEST-DIRS>" + currentPath);
             pathBox.Text = currentPath;
@@ -155,7 +157,7 @@ namespace Server.UI
             for (int i = 0; i < fileDatas.Count() - 1; i++)
                 fileStringList.Add(fileDatas[i]);
 
-            updateUi = true;
+            Main.uiRequests.Request(RequestUI.RequestType.UI_UPDATE_FILES);
         }
 
         private void fileListView_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -232,14 +234,20 @@ namespace Server.UI
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
         {
-            if (!updateUi)
-                return;
+            int requestID = Main.uiRequests.RequestReceived();
+            if (requestID != 0) // Another thread requested UI to update requsted item.
+            {
+                switch (Main.uiRequests.GetRequestType(requestID)) // Check request type and call the correct function.
+                {
+                    case RequestUI.RequestType.UI_UPDATE_FILES:
+                        foreach (string file in fileStringList)
+                            AddDataToView(file);
 
-            foreach (string file in fileStringList)
-                AddDataToView(file);
-
-            fileStringList.Clear();
-            updateUi = false;
+                        fileListView.Enabled = true;
+                        fileStringList.Clear();
+                        break;
+                }
+            }
         }
     }
 }

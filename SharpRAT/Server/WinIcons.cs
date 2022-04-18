@@ -28,6 +28,7 @@ namespace Server
             PcKeyboard = 173,
             NotAllowed = 219,
             Warning = 233,
+            Desktop = 240,
             Error = 244,
             Info = 277,
             Image = 311,
