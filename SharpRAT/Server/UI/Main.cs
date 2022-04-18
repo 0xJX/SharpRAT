@@ -155,5 +155,10 @@ namespace Server
         {
             socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SCREENSHOT>" + "<EOF>");
         }
+
+        private void menuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
     }
 }

