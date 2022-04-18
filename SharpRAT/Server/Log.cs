@@ -10,13 +10,15 @@ namespace Server.Server
             return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"\\SharpRAT\\{logName}.log";
         }
 
-        public static void DeleteFile(string logName = szDefaultLogName)
+        public static bool DeleteFile(string logName = szDefaultLogName)
         {
             string filePath = GetFilePath(logName);
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
+                return true;
             }
+            return false;
         }
 
         public static string ReadAll(string logName = szDefaultLogName)

@@ -4,38 +4,56 @@ namespace Server
 {
     public class WinIcons
     {
+        /*
+         Easy way to get ID:s for the .DLL images is, by creating an folder and changing the icon of it.
+         Then opening the folder with VSCode and you can see the hidden desktop.ini file that contains part
+         "IconResource=C:\Windows\System32\SHELL32.dll,7" where the 7 is the selected icon id. :)
+        */
+
         //https://www.digitalcitizen.life/where-find-most-windows-10s-native-icons/
         public enum ShellID // https://help4windows.com/windows_8_shell32_dll.shtml
         {
-            Shutdown_ICO = 27,
-            FileSearch_ICO = 55,
-            Config_ICO = 69,
-            Keychain_ICO = 104,
-            Question_ICO = 154,
-            PcKeyboard_ICO = 173,
-            NotAllowed_ICO = 219,
-            Warning_ICO = 233,
-            Info_ICO = 277,
-            Error_ICO = 244
+            UnknownFile = 0,
+            Executable = 2,
+            Folder = 3,
+            Drive = 7,
+            MyComputer = 15,
+            Shutdown = 27,
+            FileSearch = 55,
+            Config = 69,
+            TextFile = 70,
+            Keychain = 104,
+            FilledFolder = 126,
+            Question = 154,
+            PcKeyboard = 173,
+            NotAllowed = 219,
+            Warning = 233,
+            Error = 244,
+            Info = 277,
+            Image = 311,
+            Sound = 312,
+            Video = 313,
+            Settings = 314
         }
         public enum ComresID
         {
-            Error_ICO = 10
+            Error = 10
         }
 
         public enum Imageres
         {
-            ResourceMgr_ICO = 145
+            Admin = 73,
+            ResourceMgr = 145
         }
 
         public enum Dsuiext
         {
-            User_ICO = 3
+            User = 3
         }
 
         public enum Wmploc
         {
-            Settings_ICO = 17
+            Settings = 17
         }
 
         [DllImport("shell32", CharSet = CharSet.Unicode)]

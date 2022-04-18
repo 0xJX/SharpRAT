@@ -39,19 +39,19 @@ namespace Server
             {
                 case 0:
                     selectedIcon = MessageBoxIcon.Exclamation;
-                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Warning_ICO);
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Warning);
                     break;
                 case 1:
                     selectedIcon = MessageBoxIcon.Information;
-                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info_ICO);
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Info);
                     break;
                 case 2:
                     selectedIcon = MessageBoxIcon.Error;
-                    msgIconBox.Image = WinIcons.GetImageFromIcon("comres.dll", (int)WinIcons.ComresID.Error_ICO);
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("comres.dll", (int)WinIcons.ComresID.Error);
                     break;
                 case 3:
                     selectedIcon = MessageBoxIcon.Question;
-                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Question_ICO);
+                    msgIconBox.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Question);
                     break;
             }
         }

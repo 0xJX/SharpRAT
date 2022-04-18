@@ -6,9 +6,10 @@ using Microsoft.Win32;
 
 namespace Client.Client
 {
-    internal class SocketClient
+    public class SocketClient
     {
-        bool 
+        private static int iSocketBuffer = 1048576;
+        public static bool
             bShouldRun = true,
             bNameSent = false;
         private Socket serverSocket;
@@ -18,6 +19,7 @@ namespace Client.Client
             return serverSocket;
         }
 
+<<<<<<< HEAD
         private bool SendName()
         {
             GetServerSocket().Send(Encoding.ASCII.GetBytes("<CMD=NAME>" + WindowsHelper.GetUsername() + "<EOF>"));
@@ -84,6 +86,8 @@ namespace Client.Client
                 Debug.WriteLine("sent data back");
             }
         }
+=======
+>>>>>>> main
         public void ExecuteClient()
         {
             while (bShouldRun)
@@ -93,7 +97,7 @@ namespace Client.Client
                     // Connect to server, currently localhost and port 11111.
                     IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
                     IPAddress ipAddress = ipHost.AddressList[0];
-                    IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11111);
+                    IPEndPoint localEndPoint = new(ipAddress, 11111);
 
                     // TCP/IP Socket.
                     serverSocket = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -102,15 +106,15 @@ namespace Client.Client
                     GetServerSocket().Connect(localEndPoint);
 
                     if (!bNameSent)
-                        bNameSent = SendName();
+                        bNameSent = CommandHandler.SendName();
                     try
                     {
-                        while (serverSocket.Connected)
+                        while (GetServerSocket().Connected)
                         {
                             // Data buffer
-                            byte[] messageReceived = new byte[1024];
+                            byte[] messageReceived = new byte[iSocketBuffer];
                             int byteRecv = serverSocket.Receive(messageReceived);
-                            ParseData(Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
+                            CommandHandler.ParseData(Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
                         }
                     }
                     catch (Exception e)
@@ -118,7 +122,7 @@ namespace Client.Client
                         Console.WriteLine(e.Message);
                     }
 
-                    if (!serverSocket.Connected)
+                    if (!GetServerSocket().Connected)
                         bNameSent = false;
                 }
                 catch (Exception e)

