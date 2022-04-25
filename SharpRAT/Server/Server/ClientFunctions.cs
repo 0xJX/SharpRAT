@@ -12,7 +12,7 @@ namespace Server.Server
             string getRegKeyCMD = "<GET-REGKEY>" + szPath + "<SPLIT>" + szKeyname;
             try
             {
-                if (socketServer.Send(SocketServer.GetClient(iSelectedIndex).socket, getRegKeyCMD).IsCompleted)
+                if (SocketServer.Send(SocketServer.GetClient(iSelectedIndex).socket, getRegKeyCMD).IsCompleted)
                 {
                     Thread.Sleep(500);
                     byte[] buffer = new byte[1024];

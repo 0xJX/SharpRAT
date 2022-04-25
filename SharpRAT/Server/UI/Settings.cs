@@ -163,7 +163,7 @@ namespace Server.UI
             if (User.Config.bRunServer)
                 Main.socketServer.StartServer();
             else
-                Main.socketServer.SuspendServer();
+                Server.SocketServer.SuspendServer();
         }
     }
 }

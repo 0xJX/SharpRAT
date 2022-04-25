@@ -9,13 +9,13 @@ namespace Server.UI
         private static List<string> fileStringList = new();
         private string currentPath = "";
         private readonly ImageList imageList;
-        private readonly Socket client;
+        private readonly Client client;
 
-        public FileManager(int clientIndex)
+        public FileManager(Client selectedClient)
         {
             imageList = new ImageList();
             InitializeComponent();
-            client = SocketServer.GetClient(clientIndex).socket;
+            client = selectedClient;
         }
 
         private enum FileType
@@ -136,14 +136,14 @@ namespace Server.UI
         {
             fileListView.Enabled = false;
             fileListView.Items.Clear();
-            Main.socketServer.Send(client, "<REQUEST-DRIVES>");
+            SocketServer.Send(client.socket, "<REQUEST-DRIVES>");
         }
 
         private void RequestDirectories()
         {
             fileListView.Enabled = false;
             fileListView.Items.Clear();
-            Main.socketServer.Send(client, "<REQUEST-DIRS>" + currentPath);
+            SocketServer.Send(client.socket, "<REQUEST-DIRS>" + currentPath);
             pathBox.Text = currentPath;
         }
 

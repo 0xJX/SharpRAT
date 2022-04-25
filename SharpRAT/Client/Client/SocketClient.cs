@@ -18,6 +18,23 @@ namespace Client.Client
             return serverSocket;
         }
 
+        public bool SendASCII(string szCMD, bool sendEOF = true)
+        {
+            try
+            {
+                string finalCMD = szCMD;
+                if (sendEOF)
+                    finalCMD += "<EOF>";
+                serverSocket.Send(Encoding.ASCII.GetBytes(finalCMD));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+            return true;
+        }
+
         public void ExecuteClient()
         {
             while (bShouldRun)
@@ -37,6 +54,7 @@ namespace Client.Client
 
                     if (!bNameSent)
                         bNameSent = CommandHandler.SendName();
+
                     try
                     {
                         while (GetServerSocket().Connected)
