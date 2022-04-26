@@ -1,16 +1,17 @@
 ﻿
-namespace Server.User
+namespace Client.User
 {
     public static class Config
     {
         public static int
             iPortNumber = 11111,
             iSocketBuffer = 1048576;
+        public static string szIPAddress = "0";
         public static bool bRunServer = true;
 
         public static string GetConfigPath()
         {
-            return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\Server.cfg";
+            return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT\\Client.cfg";
         }
 
         private static int Parse(string line, string varName, int iValue)
@@ -22,6 +23,15 @@ namespace Server.User
             return int.Parse(line.Split(varStructure)[1]);
         }
 
+        private static string Parse(string line, string varName, string szValue)
+        {
+            string varStructure = "-" + varName + ":";
+            if (!line.StartsWith(varStructure))
+                return szValue;
+
+            return line.Split(varStructure)[1];
+        }
+
         private static bool Parse(string line, string varName, bool bValue)
         {
             string varStructure = "-" + varName + ":";
@@ -29,11 +39,6 @@ namespace Server.User
                 return bValue;
 
             return line.Split(varStructure)[1].StartsWith("True");
-        }
-
-        private static void WriteVariable(StreamWriter sw, string varName, string varWrite)
-        {
-            sw.WriteLine("-" + varName + ":" + varWrite);
         }
 
         public static void Read()
@@ -46,29 +51,13 @@ namespace Server.User
                     while ((line = sr.ReadLine()) != null)
                     {
                         iPortNumber = Parse(line, "iPortNumber", iPortNumber);
-                        bRunServer = Parse(line, "bRunServer", bRunServer);
+                        szIPAddress = Parse(line, "szIPAddress", szIPAddress);
                     }
-                }
-            }
-            catch(Exception ex)
-            {
-                Server.Log.Error("Config read failed: " + ex.Message);
-            }
-        }
-
-        public static void Write()
-        {
-            try
-            {
-                using (StreamWriter sw = new(GetConfigPath(), false))
-                {
-                    WriteVariable(sw, "iPortNumber", iPortNumber.ToString());
-                    WriteVariable(sw, "bRunServer", bRunServer.ToString());
                 }
             }
             catch (Exception ex)
             {
-                Server.Log.Error("Config write failed: " + ex.Message);
+                Console.WriteLine("Config read failed: " + ex.Message);
             }
         }
     }

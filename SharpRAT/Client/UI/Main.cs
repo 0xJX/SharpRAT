@@ -3,6 +3,7 @@ namespace Client
 {
     public partial class Main : Form
     {
+        private string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT";
         public static Client.SocketClient socketClient;
         public static RequestUI uiRequests;
         public Main()
@@ -14,6 +15,14 @@ namespace Client
 
         private void Main_Load(object sender, EventArgs e)
         {
+            // Create directory if it does not exist.
+            if (!File.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            // Load config values if the config exists.
+            if (File.Exists(User.Config.GetConfigPath()))
+                User.Config.Read();
+
             Thread clientThread = new(socketClient.ExecuteClient);
             clientThread.IsBackground = true;
             clientThread.Start();

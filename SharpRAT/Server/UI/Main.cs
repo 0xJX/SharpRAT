@@ -32,7 +32,7 @@ namespace Server
             imageList.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             userView.SmallImageList = imageList;
             userView.View = View.Details;
-            ListViewItem userViewItem = new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = szName };
+            ListViewItem userViewItem = new() { ImageIndex = imageList.Images.Count - 1, Text = szName };
             userViewItem.SubItems.Add(szIPAddress);
             userViewItem.SubItems.Add(szPort);
             userView.Items.Add(userViewItem);
@@ -121,15 +121,22 @@ namespace Server
 
         private void sendMessageBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageboxCreator messageboxCreator = new MessageboxCreator(socketServer, userView.SelectedItems[0].Index);
+            MessageboxCreator messageboxCreator = new(GetSelectedClient());
             messageboxCreator.ShowDialog();
         }
 
         private void userMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (userView.SelectedItems.Count == 0 || GetSelectedClient() == null) // No items selected, no need to open.
+            if (userView.SelectedItems.Count == 0) // No items selected, no need to open.
             {
                 e.Cancel = true;
+                return;
+            }
+
+            if (GetSelectedClient() == null)
+            {
+                e.Cancel = true;
+                userView.Items[userView.SelectedItems[0].Index].Remove();
                 return;
             }
 

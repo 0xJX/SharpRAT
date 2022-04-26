@@ -1,13 +1,11 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Microsoft.Win32;
 
 namespace Client.Client
 {
     public class SocketClient
     {
-        private static int iSocketBuffer = 1048576;
         public static bool
             bShouldRun = true,
             bNameSent = false;
@@ -41,15 +39,24 @@ namespace Client.Client
             {
                 try
                 {
-                    // Connect to server, currently localhost and port 11111.
-                    IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                    IPAddress ipAddress = ipHost.AddressList[0];
-                    IPEndPoint localEndPoint = new(ipAddress, 11111);
+                    // Connect to server
+
+                    IPAddress ipAddress;
+                    if (User.Config.szIPAddress == "0")
+                    {
+                        IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+                        ipAddress = ipHost.AddressList[0];
+                    }
+                    else
+                    {
+                        ipAddress = IPAddress.Parse(User.Config.szIPAddress);
+                    }
 
                     // TCP/IP Socket.
                     serverSocket = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                     // Connect to server.
+                    IPEndPoint localEndPoint = new(ipAddress, User.Config.iPortNumber);
                     GetServerSocket().Connect(localEndPoint);
 
                     if (!bNameSent)
@@ -60,7 +67,7 @@ namespace Client.Client
                         while (GetServerSocket().Connected)
                         {
                             // Data buffer
-                            byte[] messageReceived = new byte[iSocketBuffer];
+                            byte[] messageReceived = new byte[User.Config.iSocketBuffer];
                             int byteRecv = serverSocket.Receive(messageReceived);
                             CommandHandler.ParseData(Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
                         }

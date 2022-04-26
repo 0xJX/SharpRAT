@@ -175,7 +175,7 @@
             this.Name = "MessageboxCreator";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Send MessageBox to PC_Name\\PC";
+            this.Text = "Send MessageBox";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.MessageboxCreator_Load);
             this.groupBox1.ResumeLayout(false);
