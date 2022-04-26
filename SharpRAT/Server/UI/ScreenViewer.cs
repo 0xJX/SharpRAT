@@ -16,12 +16,18 @@ namespace Server.UI
         {
             InitializeComponent();
             client = selectedClient;
-            for (int i = 0; i < client.iScreenCount; i++)
-                screensBox.Items.Insert(i, (i + 1).ToString());
-
-            //if (client.iScreenCount!=0)
-                //screensBox.SelectedIndex = 0;
-
+            
+            if (client.iScreenCount!=0)
+            {
+                screensBox.Items.Clear();
+                for (int i = 0; i < client.iScreenCount; i++)
+                    screensBox.Items.Insert(i, (i + 1).ToString());
+                screensBox.SelectedIndex = 0;
+            } 
+            else
+            {
+                screensBox.Items.Clear();
+            }
 
         }
 
