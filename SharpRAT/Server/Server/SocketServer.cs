@@ -117,8 +117,10 @@ namespace Server.Server
                 {
                     data = data.Replace("<GET-TASKMGR-REG>", "");
                     if (data == "<ERROR-NOTFOUND>")
+                    {
                         Log.Error($"Task manager switch received error-notfound");
                         data = "0";
+                    }
                     client.bTaskmgrDisabled = Convert.ToBoolean(int.Parse(data));
                 }
                 catch (Exception)

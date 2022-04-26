@@ -26,7 +26,8 @@ namespace Server.UI
             } 
             else
             {
-                screensBox.Items.Clear();
+                screensBox.Items.Add("1");
+                screensBox.SelectedIndex = 0;
             }
 
         }
