@@ -16,8 +16,9 @@ namespace Server.UI
         {
             InitializeComponent();
             client = selectedClient;
-            
-            if (client.iScreenCount!=0)
+            Text += " - " + client.GetUsername();
+
+            if (client.iScreenCount != 0)
             {
                 screensBox.Items.Clear();
                 for (int i = 0; i < client.iScreenCount; i++)
@@ -60,6 +61,7 @@ namespace Server.UI
                 }
             }
         }
+
         public static void ReceivePrintscreenFinish()
         {
             using (MemoryStream stream = new MemoryStream(imageStream))
@@ -110,7 +112,7 @@ namespace Server.UI
 
         private void saveImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog SFD = new SaveFileDialog())
+            using (SaveFileDialog SFD = new())
             {
                 SFD.Title = "Save image to...";
                 SFD.Filter = "JPEG File(*.jpeg)|*.jpeg";

@@ -16,6 +16,7 @@ namespace Server.UI
             imageList = new ImageList();
             InitializeComponent();
             client = selectedClient;
+            Text += " - " + client.GetUsername();
         }
 
         private enum FileType
@@ -134,14 +135,12 @@ namespace Server.UI
 
         private void RequestDrives()
         {
-            fileListView.Enabled = false;
             fileListView.Items.Clear();
             SocketServer.Send(client.socket, "<REQUEST-DRIVES>");
         }
 
         private void RequestDirectories()
         {
-            fileListView.Enabled = false;
             fileListView.Items.Clear();
             SocketServer.Send(client.socket, "<REQUEST-DIRS>" + currentPath);
             pathBox.Text = currentPath;
@@ -243,7 +242,6 @@ namespace Server.UI
                         foreach (string file in fileStringList)
                             AddDataToView(file);
 
-                        fileListView.Enabled = true;
                         fileStringList.Clear();
                         break;
                 }

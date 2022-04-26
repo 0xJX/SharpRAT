@@ -4,15 +4,14 @@ namespace Server
 {
     public partial class MessageboxCreator : Form
     {
-        int iSelectedIndex = -1;
-        private SocketServer socketServer;
+        private static Client client;
         private MessageBoxIcon selectedIcon = MessageBoxIcon.Information;
 
-        public MessageboxCreator(SocketServer socketServer, int iClientIndex)
+        public MessageboxCreator(Client selectedClient)
         {
             InitializeComponent();
-            iSelectedIndex = iClientIndex;
-            this.socketServer = socketServer;
+            client = selectedClient;
+            Text += " - " + client.GetUsername();
         }
 
         private void MessageboxCreator_Load(object sender, EventArgs e)
@@ -25,7 +24,7 @@ namespace Server
             string messageBoxStr
                 = "<SEND-MSGBOX>" + textBox.Text + "<SPLIT>" + titleBox.Text + "<SPLIT>" +
                  msgTypeBox.SelectedIndex.ToString() + "<EOF>";
-            SocketServer.Send(SocketServer.GetClient(iSelectedIndex).socket, messageBoxStr);
+            SocketServer.Send(client.socket, messageBoxStr);
         }
 
         private void testBtn_Click(object sender, EventArgs e)
