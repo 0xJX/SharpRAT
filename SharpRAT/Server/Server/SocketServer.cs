@@ -113,8 +113,18 @@ namespace Server.Server
 
             if(data.StartsWith("<GET-TASKMGR-REG>"))
             {
-                data = data.Replace("<GET-TASKMGR-REG>", "");
-                client.bTaskmgrDisabled = Convert.ToBoolean(int.Parse(data));
+                try
+                {
+                    data = data.Replace("<GET-TASKMGR-REG>", "");
+                    if (data == "<ERROR-NOTFOUND>")
+                        Log.Error($"Task manager switch received error-notfound");
+                        data = "0";
+                    client.bTaskmgrDisabled = Convert.ToBoolean(int.Parse(data));
+                }
+                catch (Exception)
+                {
+                    Log.Error($"Task manager switch was unsuccessful with state of: {data}");
+                }
             }
 
             if (data.StartsWith("<GET-SCREENCOUNT>"))

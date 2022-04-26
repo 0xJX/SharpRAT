@@ -44,11 +44,11 @@ namespace Client.Client
 
         public static string ReadRegistryKey(string szPath, string szKeyname)
         {
+
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(szPath, true);
 
             if (registryKey == null)
             {
-                registryKey.Close();
                 return "<ERROR-NOTFOUND>";
             }
 
@@ -60,5 +60,6 @@ namespace Client.Client
 
             return value;
         }
+
     }
 }
