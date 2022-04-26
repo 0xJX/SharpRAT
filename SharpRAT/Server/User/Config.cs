@@ -8,7 +8,9 @@ namespace Server.User
 {
     public static class Config
     {
-        public static int iPortNumber = 11111;
+        public static int 
+            iPortNumber = 11111,
+            iSocketBuffer = 1048576;
         public static bool bRunServer = true;
 
         public static string GetConfigPath()

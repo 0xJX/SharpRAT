@@ -71,6 +71,7 @@ namespace Server
             Bitmap img = Bitmap.FromHicon(Extract(filePath, index, largeIcon).Handle);
             return img;
         }
+
         public static Icon Extract(string filePath, int index, bool largeIcon = true)
         {
             if (filePath == null)

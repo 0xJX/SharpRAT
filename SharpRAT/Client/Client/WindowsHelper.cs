@@ -10,6 +10,11 @@ namespace Client.Client
             return System.Security.Principal.WindowsIdentity.GetCurrent().Name;
         }
 
+        public static int GetScreenCount()
+        {
+            return Screen.AllScreens.Length;
+        }
+
         public static void WriteRegistryKey(string szPath, RegistryValueKind regType, string szKeyname, string szKeyValue, bool bCreateNew = false)
         {
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(szPath, true);

@@ -14,7 +14,7 @@ namespace Client
 
         private void Main_Load(object sender, EventArgs e)
         {
-            Thread clientThread = new Thread(socketClient.ExecuteClient);
+            Thread clientThread = new(socketClient.ExecuteClient);
             clientThread.IsBackground = true;
             clientThread.Start();
 
@@ -45,6 +45,7 @@ namespace Client
                     break;
             }
 
+            // Show messagebox with topmost enabled using form.
             using (Form form = new Form())
             {
                 form.TopMost = true;

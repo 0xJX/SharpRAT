@@ -6,10 +6,10 @@ namespace Client.Client
 {
     internal class ScreenViewer
     {
-        public static void TakePrintScreen()
+        public static void TakePrintScreen(int screenIndex)
         {
             Bitmap bitmap = new(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, PixelFormat.Format32bppArgb);
-            Rectangle captureRectangle = Screen.AllScreens[0].Bounds;
+            Rectangle captureRectangle = Screen.AllScreens[screenIndex].Bounds;
             Graphics captureGraphics = Graphics.FromImage(bitmap);
             captureGraphics.CopyFromScreen(captureRectangle.Left, captureRectangle.Top, 0, 0, captureRectangle.Size);
 
