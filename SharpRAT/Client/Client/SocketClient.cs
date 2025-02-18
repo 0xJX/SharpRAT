@@ -6,9 +6,7 @@ namespace Client.Client
 {
     public class SocketClient
     {
-        public static bool
-            bShouldRun = true,
-            bNameSent = false;
+        public static bool bShouldRun = true;
         private Socket serverSocket;
 
         public Socket GetServerSocket()
@@ -16,14 +14,14 @@ namespace Client.Client
             return serverSocket;
         }
 
-        public bool SendASCII(string szCMD, bool sendEOF = true)
+        public bool SendUTF8(string szCMD, bool sendEOF = true)
         {
             try
             {
                 string finalCMD = szCMD;
                 if (sendEOF)
                     finalCMD += "<EOF>";
-                serverSocket.Send(Encoding.ASCII.GetBytes(finalCMD));
+                serverSocket.Send(Encoding.UTF8.GetBytes(finalCMD));
             }
             catch (Exception e)
             {
@@ -59,8 +57,11 @@ namespace Client.Client
                     IPEndPoint localEndPoint = new(ipAddress, User.Config.iPortNumber);
                     GetServerSocket().Connect(localEndPoint);
 
-                    if (!bNameSent)
-                        bNameSent = CommandHandler.SendName();
+                    if (GetServerSocket().Connected)
+                    {
+                        Console.WriteLine("ExecuteClient: Socket connected successfully");
+                        CommandHandler.SendName();
+                    }
 
                     try
                     {
@@ -69,20 +70,22 @@ namespace Client.Client
                             // Data buffer
                             byte[] messageReceived = new byte[User.Config.iSocketBuffer];
                             int byteRecv = serverSocket.Receive(messageReceived);
-                            CommandHandler.ParseData(Encoding.ASCII.GetString(messageReceived, 0, byteRecv));
+                            if (byteRecv == 0)
+                            {
+                                Console.WriteLine("ExecuteClient: No bytes received, disconnecting.");
+                                GetServerSocket().Disconnect(true);
+                            }
+                            CommandHandler.ParseData(Encoding.UTF8.GetString(messageReceived, 0, byteRecv));
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        Console.WriteLine("ExecuteClient: " + e.Message);
                     }
-
-                    if (!GetServerSocket().Connected)
-                        bNameSent = false;
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine("ExecuteClient: " + e.Message);
                 }
             }
         }

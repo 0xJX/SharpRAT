@@ -11,7 +11,7 @@ namespace Server
         */
 
         //https://www.digitalcitizen.life/where-find-most-windows-10s-native-icons/
-        public enum ShellID // https://help4windows.com/windows_8_shell32_dll.shtml
+        public enum ShellID
         {
             UnknownFile = 0,
             Executable = 2,
@@ -23,11 +23,14 @@ namespace Server
             Config = 69,
             TextFile = 70,
             Keychain = 104,
+            Download = 122,
             FilledFolder = 126,
             Question = 154,
             PcKeyboard = 173,
+            RunFile = 214,
             NotAllowed = 219,
             Warning = 233,
+            Refresh = 238,
             Desktop = 240,
             Error = 244,
             Info = 277,

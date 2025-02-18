@@ -1,12 +1,17 @@
 ﻿
 using Server.Server;
+using Server.User;
 using System.Net.Sockets;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Server.UI
 {
     public partial class FileManager : Form
     {
         private static List<string> fileStringList = new();
+        private static List<ClientFile> fileObjectList = new();
         private string currentPath = "";
         private readonly ImageList imageList;
         private readonly Client client;
@@ -17,73 +22,6 @@ namespace Server.UI
             InitializeComponent();
             client = selectedClient;
             Text += " - " + client.GetUsername();
-        }
-
-        private enum FileType
-        {
-            MY_COMPUTER,
-            DRIVE,
-            FILE_FOLDER,
-            FILE,
-            EXECUTABLE,
-            DLL,
-            IMAGE,
-            VIDEO,
-            TEXT_DOCUMENT
-        }
-
-        private string GetFileSizeString(long bytes)
-        {
-            if (bytes == 0)
-                return "";
-
-            string ending = "bytes";
-            long tempBytes = bytes;
-
-            if (tempBytes >= 1000000000)
-            {
-                tempBytes /= 1000000000;
-                ending = "gigabytes";
-            }
-            else if (tempBytes >= 1000000)
-            {
-                tempBytes /= 1000000;
-                ending = "megabytes";
-            }
-            else if (tempBytes >= 1000)
-            {
-                tempBytes /= 1000;
-                ending = "kilobytes";
-            }
-
-            return tempBytes.ToString() + " " + ending;
-        }
-
-        private string GetFileTypeString(FileType type)
-        {
-            switch (type)
-            {
-                case FileType.MY_COMPUTER:
-                    return "My Computer";
-                case FileType.DRIVE:
-                    return "Drive";
-                case FileType.FILE_FOLDER:
-                    return "File Folder";
-                case FileType.FILE:
-                    return "File";
-                case FileType.EXECUTABLE:
-                    return "Executable";
-                case FileType.DLL:
-                    return "DLL";
-                case FileType.IMAGE:
-                    return "Image";
-                case FileType.VIDEO:
-                    return "Video";
-                case FileType.TEXT_DOCUMENT:
-                    return "Text Document";
-                default:
-                    return "???";
-            }
         }
 
         private Bitmap GetFileIcon(FileType type)
@@ -104,6 +42,8 @@ namespace Server.UI
                     return WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Config, false);
                 case FileType.IMAGE:
                     return WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Image);
+                case FileType.AUDIO:
+                    return WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Sound);
                 case FileType.VIDEO:
                     return WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Video);
                 case FileType.TEXT_DOCUMENT:
@@ -113,17 +53,24 @@ namespace Server.UI
             }
         }
 
-        private void AddFileToList(string name, string dateModified, FileType type, long size)
+        private void AddFileToList(ClientFile file)
         {
-            imageList.Images.Add(GetFileIcon(type));
+            imageList.Images.Add(GetFileIcon(file.type));
             imageList.ColorDepth = ColorDepth.Depth32Bit; // Improves quality of the image.
             fileListView.SmallImageList = imageList;
             fileListView.View = View.Details;
-            ListViewItem fileViewItem = new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = name };
-            fileViewItem.SubItems.Add(dateModified);
-            fileViewItem.SubItems.Add(GetFileTypeString(type));
-            fileViewItem.SubItems.Add(GetFileSizeString(size));
+            ListViewItem fileViewItem = new ListViewItem { ImageIndex = imageList.Images.Count - 1, Text = file.name };
+            fileViewItem.SubItems.Add(file.dateModified);
+            fileViewItem.SubItems.Add(file.GetFileTypeString());
+            fileViewItem.SubItems.Add(file.GetFileSizeString());
             fileListView.Items.Add(fileViewItem);
+            fileObjectList.Add(file);
+        }
+
+        private void LoadImagesForUI()
+        {
+            openFileToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.RunFile);
+            refreshDirectoryToolStripMenuItem.Image = WinIcons.GetImageFromIcon("shell32.dll", (int)WinIcons.ShellID.Refresh);
         }
 
         private void FileManager_Load(object sender, EventArgs e)
@@ -131,17 +78,26 @@ namespace Server.UI
             currentPath = "";
             Icon = WinIcons.Extract("shell32.dll", (int)WinIcons.ShellID.FilledFolder, false);
             RequestDrives();
+            LoadImagesForUI();
+        }
+
+        private void RequestOpenFile(ClientFile file)
+        {
+            SocketServer.Send(client.socket, "<REQUEST-OPENFILE>" + currentPath + "\\" + file.name);
         }
 
         private void RequestDrives()
         {
             fileListView.Items.Clear();
+            fileObjectList.Clear();
             SocketServer.Send(client.socket, "<REQUEST-DRIVES>");
+            pathBox.Text = currentPath;
         }
 
         private void RequestDirectories()
         {
             fileListView.Items.Clear();
+            fileObjectList.Clear();
             SocketServer.Send(client.socket, "<REQUEST-DIRS>" + currentPath);
             pathBox.Text = currentPath;
         }
@@ -153,7 +109,7 @@ namespace Server.UI
             if (fileDatas == null)
                 return;
 
-            for (int i = 0; i < fileDatas.Count() - 1; i++)
+            for (int i = 0; i < fileDatas.Count() - 1; ++i)
                 fileStringList.Add(fileDatas[i]);
 
             Main.uiRequests.Request(RequestUI.RequestType.UI_UPDATE_FILES);
@@ -165,25 +121,25 @@ namespace Server.UI
             {
                 string selectedFile = fileListView.SelectedItems[0].Text;
 
-                if(currentPath.Length <= 3 && fileListView.SelectedItems[0].Text.Equals("..."))
+                if (currentPath.Length <= 3 && fileListView.SelectedItems[0].Text.Equals("..."))
                 {
                     currentPath = "";
                     RequestDrives();
                     return;
                 }
-                else if(fileListView.SelectedItems[0].Index == 0 && fileListView.SelectedItems[0].Text.Equals("..."))
+                else if (fileListView.SelectedItems[0].Index == 0 && fileListView.SelectedItems[0].Text.Equals("..."))
                 {
                     string newPath = string.Empty;
                     string[] pathFolders = currentPath.Split(@"\");
 
                     // Build path string without the last folder.
-                    for (int i = 0; i < (pathFolders.Count() - 1); i++)
+                    for (int i = 0; i < (pathFolders.Count() - 1); ++i)
                     {
                         newPath += pathFolders[i];
-                        if(i != (pathFolders.Count() - 2))
+                        if (i != (pathFolders.Count() - 2))
                             newPath += @"\";
 
-                        if(!newPath.Contains(@"\"))
+                        if (!newPath.Contains(@"\"))
                         {
                             if (currentPath.Length <= 3)
                             {
@@ -203,12 +159,15 @@ namespace Server.UI
                     currentPath = newPath;
                     RequestDirectories();
                 }
-                else if(Path.GetExtension(currentPath + selectedFile).Length > 0)
+                else if (Path.GetExtension(currentPath + selectedFile).Length > 0)
                 {
                     // Do nothing.
                 }
                 else if (!string.IsNullOrEmpty(selectedFile))
                 {
+                    if (fileObjectList[fileListView.SelectedItems[0].Index].type != FileType.FILE_FOLDER && fileObjectList[fileListView.SelectedItems[0].Index].type != FileType.DRIVE)
+                        return;
+
                     if (!selectedFile.StartsWith(@"\") && currentPath.Length >= 2)
                         selectedFile = @"\" + selectedFile;
                     currentPath = currentPath + selectedFile;
@@ -218,7 +177,7 @@ namespace Server.UI
                 }
             }
         }
-        
+
         private void AddDataToView(string fileData)
         {
             string[] splitData = fileData.Split("<SPLIT>");
@@ -228,24 +187,87 @@ namespace Server.UI
             FileType type = (FileType)int.Parse(splitData[2]);
             long size = long.Parse(splitData[3]);
 
-            AddFileToList(name, dateModified, type, size);
+            ClientFile file = new(name, size, dateModified, type);
+            AddFileToList(file);
         }
 
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
         {
             int requestID = Main.uiRequests.RequestReceived();
-            if (requestID != 0) // Another thread requested UI to update requsted item.
+            if (requestID != -1) // Another thread requested UI to update requsted item.
             {
                 switch (Main.uiRequests.GetRequestType(requestID)) // Check request type and call the correct function.
                 {
                     case RequestUI.RequestType.UI_UPDATE_FILES:
+
+                        // Clear old data when receiving new data.
+                        fileListView.Items.Clear();
+                        fileObjectList.Clear();
+
                         foreach (string file in fileStringList)
                             AddDataToView(file);
 
-                        fileStringList.Clear();
+                        if (fileListView.Items.Count != 0)
+                        {
+                            fileStringList.Clear();
+                            Main.uiRequests.GetRequests().RemoveAt(requestID);
+                        }
                         break;
                 }
             }
+        }
+
+        private int GetSelectedFileIndex()
+        {
+            return fileListView.SelectedItems[0].Index;
+        }
+
+
+        private void fileMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (fileListView.SelectedItems.Count == 0)
+            {
+                openFileToolStripMenuItem.Visible = false;
+                return;
+            }
+
+            ClientFile currentFile = fileObjectList[GetSelectedFileIndex()];
+            if (currentFile.type == FileType.DRIVE || currentFile.type == FileType.FILE_FOLDER)
+            {
+                openFileToolStripMenuItem.Visible = false;
+                return;
+            }
+
+            openFileToolStripMenuItem.Visible = true;
+        }
+
+        private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClientFile currentFile = fileObjectList[GetSelectedFileIndex()];
+            if (currentFile == null)
+                return;
+            RequestOpenFile(fileObjectList[GetSelectedFileIndex()]);
+        }
+
+        private void fileListView_Click(object sender, EventArgs e)
+        {
+            ClientFile currentFile = fileObjectList[GetSelectedFileIndex()];
+            if (currentFile == null)
+            {
+                pathBox.Text = currentPath;
+                return;
+            }
+
+            string slashStr = !currentPath.EndsWith("\\") ? "\\" : "";
+            pathBox.Text = $"{currentPath}{slashStr}{currentFile.name}";
+        }
+
+        private void refreshDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (currentPath == "")
+                RequestDrives();
+            else
+                RequestDirectories();
         }
     }
 }

