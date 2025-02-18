@@ -86,13 +86,14 @@ namespace Server.UI
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
         {
             int requestID = Main.uiRequests.RequestReceived();
-            if (requestID != 0) // Another thread requested UI to update requsted item.
+            if (requestID != -1) // Another thread requested UI to update requsted item.
             {
                 switch (Main.uiRequests.GetRequestType(requestID)) // Check request type and call the correct function.
                 {
                     case RequestUI.RequestType.UI_UPDATE_SCREENSHOT:
                         imageBox.Image = printScreenImage;
                         imageStream = Array.Empty<byte>();
+                        Main.uiRequests.ClearRequestOfType(RequestUI.RequestType.UI_UPDATE_SCREENSHOT);
                         break;
                 }
             }

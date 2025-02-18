@@ -18,8 +18,9 @@ namespace Server.Server
             {
                 return clients[index];
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.Error("GetClient: " + e.Message);
                 return null;
             }
         }
@@ -51,11 +52,11 @@ namespace Server.Server
                 }
                 catch (SocketException e)
                 {
-                    // Normal stuff.
+                    Log.Error("CheckClientsThread: " + e.Message);
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Server: " + e.Message);
+                    Log.Error("CheckClientsThread: " + e.Message);
                 }
                 Thread.Sleep(100);
             }
@@ -77,8 +78,9 @@ namespace Server.Server
             {
                 client.socket.Receive(buffer);
             }
-            catch (SocketException)
+            catch (SocketException e)
             {
+                Log.Action("ReadClient: " + e.Message);
                 return false; // Connection failed.
             }
 
@@ -87,7 +89,7 @@ namespace Server.Server
                 if (IsBufferEmpty(buffer, User.Config.iSocketBuffer))
                     return false;
 
-                string tempString = Encoding.ASCII.GetString(buffer);
+                string tempString = Encoding.UTF8.GetString(buffer);
                 tempString = tempString.Split("<EOF>")[0];
 
                 ParseData(client, tempString);
@@ -163,26 +165,33 @@ namespace Server.Server
             Socket clientSocket = client.socket;
 
             // Read data from the client socket. 
-            int bytesRead = clientSocket.EndReceive(ar);
-
-            if (bytesRead > 0)
+            try
             {
-                // There  might be more data, so store the data received so far.
-                client.dataStringBuilder.Append(Encoding.ASCII.GetString(client.buffer, 0, bytesRead));
+                int bytesRead = clientSocket.EndReceive(ar);
 
-                // Check for end-of-file tag. If it is not there, read more data.
-                string data = client.dataStringBuilder.ToString();
-                if (data.IndexOf("<EOF>") > -1)
+                if (bytesRead > 0)
                 {
-                    // Parse first initial received data
-                    string szCMD = data.Replace("<EOF>", "");
-                    ParseData(client, szCMD);
+                    // There might be more data, so store the data received so far.
+                    client.dataStringBuilder.Append(Encoding.UTF8.GetString(client.buffer, 0, bytesRead));
+
+                    // Check for end-of-file tag. If it is not there, read more data.
+                    string data = client.dataStringBuilder.ToString();
+                    if (data.IndexOf("<EOF>") > -1)
+                    {
+                        // Parse first initial received data
+                        string szCMD = data.Replace("<EOF>", "");
+                        ParseData(client, szCMD);
+                    }
+                    else
+                    {
+                        // Not all data received. Get more.
+                        clientSocket.BeginReceive(client.buffer, 0, User.Config.iSocketBuffer, 0, new AsyncCallback(ReadCallback), client);
+                    }
                 }
-                else
-                {
-                    // Not all data received. Get more.
-                    clientSocket.BeginReceive(client.buffer, 0, User.Config.iSocketBuffer, 0, new AsyncCallback(ReadCallback), client);
-                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("ReadCallback: " + e.Message);
             }
         }
 
@@ -196,12 +205,19 @@ namespace Server.Server
             Main.uiRequests.Request("Connection accepted.", RequestUI.RequestType.UI_UPDATE_STATUS);
         }
 
-        public static IAsyncResult Send(Socket handler, string data)
+        public static void Send(Socket handler, string data)
         {
-            // Convert the string data to byte data using ASCII encoding.
-            byte[] byteData = Encoding.ASCII.GetBytes(data + "<EOF>");
-            // Begin sending the data to the remote device.
-            return handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+            try
+            {
+                // Convert the string data to byte data using UTF8 encoding.
+                byte[] byteData = Encoding.UTF8.GetBytes(data + "<EOF>");
+                // Begin sending the data to the remote device.
+                handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+            }
+            catch (Exception e)
+            {
+                Log.Error("SendCallback: " + e.Message);
+            }
         }
 
         private static void SendCallback(IAsyncResult ar)

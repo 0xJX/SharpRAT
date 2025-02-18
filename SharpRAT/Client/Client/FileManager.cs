@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using System.Text;
 
 namespace Client.Client
@@ -17,6 +18,7 @@ namespace Client.Client
             EXECUTABLE,
             DLL,
             IMAGE,
+            AUDIO,
             VIDEO,
             TEXT_DOCUMENT
         }
@@ -27,8 +29,11 @@ namespace Client.Client
             switch (extension)
             {
                 case ".txt":
+                case ".ini":
                 case ".log":
                 case ".cfg":
+                case ".srt":
+                case ".dat":
                     return FileType.TEXT_DOCUMENT;
                 case ".exe":
                     return FileType.EXECUTABLE;
@@ -50,6 +55,15 @@ namespace Client.Client
                 case ".wmv":
                 case ".avi":
                     return FileType.VIDEO;
+                case ".mp3":
+                case ".wav":
+                case ".wma":
+                case ".aac":
+                case ".flac":
+                case ".m4a":
+                case ".m4b":
+                case ".ogg":
+                    return FileType.AUDIO;
                 default:
                     return FileType.FILE;
             }
@@ -59,6 +73,7 @@ namespace Client.Client
         {
             fileStringList.Add(name + "<SPLIT>" + dateModified + "<SPLIT>" + ((int)type).ToString() + "<SPLIT>" + size.ToString() + "<FILE-END>");
         }
+
 
         public static bool LoadDirectories(string newPath)
         {
@@ -80,9 +95,19 @@ namespace Client.Client
                 SendFileList();
                 return status;
             }
+            catch (UnauthorizedAccessException)
+            {
+                AddFileToList("No access to load content!", "", FileType.FILE, 0);
+                SendFileList();
+            }
+            catch (DirectoryNotFoundException)
+            {
+                AddFileToList("Directory not found!", "", FileType.FILE, 0);
+                SendFileList();
+            }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("LoadDirectories: " + ex.Message);
             }
             return false;
         }
@@ -106,7 +131,7 @@ namespace Client.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("LoadFiles: " + ex.Message);
             }
             return false;
         }
@@ -121,7 +146,7 @@ namespace Client.Client
                 {
                     if (d.IsReady == true)
                     {
-                        AddFileToList(d.Name, "-", FileType.DRIVE, (d.TotalSize - d.AvailableFreeSpace));
+                        AddFileToList(d.Name, "-", FileType.DRIVE, d.TotalSize);
                     }
                 }
                 SendFileList();
@@ -129,7 +154,7 @@ namespace Client.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("LoadDrives: " + ex.Message);
             }
             return false;
         }
@@ -140,7 +165,24 @@ namespace Client.Client
             foreach (string file in fileStringList)
                 filesString += file;
 
-            Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<FILE>" + filesString + "<EOF>"));
+            Console.WriteLine("Sending filelist to server that contains: " + fileStringList.Count() + " files.");
+            Main.socketClient.GetServerSocket().Send(Encoding.UTF8.GetBytes("<FILE>" + filesString + "<EOF>"));
+            fileStringList.Clear();
+        }
+
+        public static void OpenFile(string filePath)
+        {
+            Console.WriteLine("OpenFile called with path: " + filePath);
+            if (File.Exists(filePath))
+            {
+                Process process = new Process();
+                process.StartInfo = new ProcessStartInfo()
+                {
+                    UseShellExecute = true,
+                    FileName = filePath
+                };
+                process.Start();
+            }
         }
     }
 }

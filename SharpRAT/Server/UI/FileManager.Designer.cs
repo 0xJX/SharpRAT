@@ -28,101 +28,120 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.fileListView = new System.Windows.Forms.ListView();
-            this.nameHeader = new System.Windows.Forms.ColumnHeader();
-            this.dateModHeader = new System.Windows.Forms.ColumnHeader();
-            this.typeHeader = new System.Windows.Forms.ColumnHeader();
-            this.sizeHeader = new System.Windows.Forms.ColumnHeader();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.pathBox = new System.Windows.Forms.TextBox();
-            this.uiUpdateTimer = new System.Windows.Forms.Timer(this.components);
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            fileListView = new ListView();
+            nameHeader = new ColumnHeader();
+            dateModHeader = new ColumnHeader();
+            typeHeader = new ColumnHeader();
+            sizeHeader = new ColumnHeader();
+            fileMenuStrip = new ContextMenuStrip(components);
+            openFileToolStripMenuItem = new ToolStripMenuItem();
+            groupBox1 = new GroupBox();
+            pathBox = new TextBox();
+            uiUpdateTimer = new System.Windows.Forms.Timer(components);
+            refreshDirectoryToolStripMenuItem = new ToolStripMenuItem();
+            fileMenuStrip.SuspendLayout();
+            groupBox1.SuspendLayout();
+            SuspendLayout();
             // 
             // fileListView
             // 
-            this.fileListView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.fileListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.nameHeader,
-            this.dateModHeader,
-            this.typeHeader,
-            this.sizeHeader});
-            this.fileListView.Location = new System.Drawing.Point(12, 57);
-            this.fileListView.Name = "fileListView";
-            this.fileListView.Size = new System.Drawing.Size(776, 381);
-            this.fileListView.TabIndex = 0;
-            this.fileListView.UseCompatibleStateImageBehavior = false;
-            this.fileListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.fileListView_MouseDoubleClick);
+            fileListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            fileListView.Columns.AddRange(new ColumnHeader[] { nameHeader, dateModHeader, typeHeader, sizeHeader });
+            fileListView.ContextMenuStrip = fileMenuStrip;
+            fileListView.Location = new Point(12, 57);
+            fileListView.Name = "fileListView";
+            fileListView.Size = new Size(776, 381);
+            fileListView.TabIndex = 0;
+            fileListView.UseCompatibleStateImageBehavior = false;
+            fileListView.Click += fileListView_Click;
+            fileListView.MouseDoubleClick += fileListView_MouseDoubleClick;
             // 
             // nameHeader
             // 
-            this.nameHeader.Text = "Name";
-            this.nameHeader.Width = 200;
+            nameHeader.Text = "Name";
+            nameHeader.Width = 200;
             // 
             // dateModHeader
             // 
-            this.dateModHeader.Text = "Date modified";
-            this.dateModHeader.Width = 200;
+            dateModHeader.Text = "Date modified";
+            dateModHeader.Width = 200;
             // 
             // typeHeader
             // 
-            this.typeHeader.Text = "Type";
-            this.typeHeader.Width = 200;
+            typeHeader.Text = "Type";
+            typeHeader.Width = 200;
             // 
             // sizeHeader
             // 
-            this.sizeHeader.Text = "Size";
-            this.sizeHeader.Width = 200;
+            sizeHeader.Text = "Size";
+            sizeHeader.Width = 200;
+            // 
+            // fileMenuStrip
+            // 
+            fileMenuStrip.Items.AddRange(new ToolStripItem[] { openFileToolStripMenuItem, refreshDirectoryToolStripMenuItem });
+            fileMenuStrip.Name = "contextMenuStrip1";
+            fileMenuStrip.Size = new Size(181, 70);
+            fileMenuStrip.Opening += fileMenuStrip_Opening;
+            // 
+            // openFileToolStripMenuItem
+            // 
+            openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
+            openFileToolStripMenuItem.Size = new Size(180, 22);
+            openFileToolStripMenuItem.Text = "Open file";
+            openFileToolStripMenuItem.Click += openFileToolStripMenuItem_Click;
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.pathBox);
-            this.groupBox1.Location = new System.Drawing.Point(12, 5);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(776, 46);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Current path";
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(pathBox);
+            groupBox1.Location = new Point(12, 5);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(776, 46);
+            groupBox1.TabIndex = 1;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Current path";
             // 
             // pathBox
             // 
-            this.pathBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pathBox.BackColor = System.Drawing.Color.White;
-            this.pathBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pathBox.Location = new System.Drawing.Point(6, 17);
-            this.pathBox.Name = "pathBox";
-            this.pathBox.ReadOnly = true;
-            this.pathBox.Size = new System.Drawing.Size(764, 23);
-            this.pathBox.TabIndex = 0;
+            pathBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pathBox.BackColor = Color.White;
+            pathBox.BorderStyle = BorderStyle.FixedSingle;
+            pathBox.Location = new Point(6, 17);
+            pathBox.Name = "pathBox";
+            pathBox.ReadOnly = true;
+            pathBox.Size = new Size(764, 23);
+            pathBox.TabIndex = 0;
             // 
             // uiUpdateTimer
             // 
-            this.uiUpdateTimer.Enabled = true;
-            this.uiUpdateTimer.Interval = 1;
-            this.uiUpdateTimer.Tick += new System.EventHandler(this.uiUpdateTimer_Tick);
+            uiUpdateTimer.Enabled = true;
+            uiUpdateTimer.Interval = 1;
+            uiUpdateTimer.Tick += uiUpdateTimer_Tick;
+            // 
+            // refreshDirectoryToolStripMenuItem
+            // 
+            refreshDirectoryToolStripMenuItem.Name = "refreshDirectoryToolStripMenuItem";
+            refreshDirectoryToolStripMenuItem.Size = new Size(180, 22);
+            refreshDirectoryToolStripMenuItem.Text = "Refresh directory";
+            refreshDirectoryToolStripMenuItem.Click += refreshDirectoryToolStripMenuItem_Click;
             // 
             // FileManager
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.fileListView);
-            this.Name = "FileManager";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "FileManager";
-            this.Load += new System.EventHandler(this.FileManager_Load);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.White;
+            ClientSize = new Size(800, 450);
+            Controls.Add(groupBox1);
+            Controls.Add(fileListView);
+            Name = "FileManager";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "FileManager";
+            Load += FileManager_Load;
+            fileMenuStrip.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion
@@ -135,5 +154,8 @@
         private GroupBox groupBox1;
         private TextBox pathBox;
         private System.Windows.Forms.Timer uiUpdateTimer;
+        private ContextMenuStrip fileMenuStrip;
+        private ToolStripMenuItem openFileToolStripMenuItem;
+        private ToolStripMenuItem refreshDirectoryToolStripMenuItem;
     }
 }

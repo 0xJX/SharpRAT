@@ -1,4 +1,5 @@
 using Server.Server;
+using Server.UI;
 
 namespace Server
 {
@@ -46,6 +47,7 @@ namespace Server
             int index = int.Parse(text);
             try
             {
+                UpdateStatus($"{userView.Items[index].Text} disconnected.");
                 Log.Info($"Client {userView.Items[index].Text} - [{userView.Items[index].SubItems[1].Text}:" +
                     $"{userView.Items[index].SubItems[2].Text}] disconnected.");
                 userView.Items[index].Remove();
@@ -96,18 +98,21 @@ namespace Server
         private void uiUpdateTimer_Tick(object sender, EventArgs e)
         {
             int requestID = uiRequests.RequestReceived();
-            if (requestID != 0) // Another thread requested UI to update requsted item.
+            if (requestID != -1) // Another thread requested UI to update requsted item.
             {
                 switch(uiRequests.GetRequestType(requestID)) // Check request type and call the correct function.
                 {
                     case RequestUI.RequestType.UI_ADD_USER:
                         AddUserToViewlist(uiRequests.GetRequestText(requestID));
+                        uiRequests.GetRequests().RemoveAt(requestID);
                         break;
                     case RequestUI.RequestType.UI_REMOVE_USER:
                         RemoveUserFromViewlist(uiRequests.GetRequestText(requestID));
+                        uiRequests.GetRequests().RemoveAt(requestID);
                         break;
                     case RequestUI.RequestType.UI_UPDATE_STATUS:
                         UpdateStatus(uiRequests.GetRequestText(requestID));
+                        uiRequests.GetRequests().RemoveAt(requestID);
                         break;
                 }
             }
@@ -161,18 +166,21 @@ namespace Server
         {
             UI.Settings settings = new();
             settings.ShowDialog();
+            settings.Dispose();
         }
 
         private void fileManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UI.FileManager fileManager = new(GetSelectedClient());
             fileManager.ShowDialog();
+            fileManager.Dispose();
         }
 
         private void viewScreenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UI.ScreenViewer screenViewer = new(GetSelectedClient());
             screenViewer.ShowDialog();
+            screenViewer.Dispose();
         }
     }
 }

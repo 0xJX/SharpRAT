@@ -22,7 +22,7 @@ namespace Client.Client
 
             if(imageStream != null)
             {
-                Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<PRINTSCREEN>"));
+                Main.socketClient.GetServerSocket().Send(Encoding.UTF8.GetBytes("<PRINTSCREEN>"));
                 SendImageToServer(imageStream);
             }
         }
@@ -30,7 +30,7 @@ namespace Client.Client
         public static void SendImageToServer(byte[] imageData)
         {
             Main.socketClient.GetServerSocket().Send(imageData);
-            Main.socketClient.GetServerSocket().Send(Encoding.ASCII.GetBytes("<EOF>"));
+            Main.socketClient.GetServerSocket().Send(Encoding.UTF8.GetBytes("<EOF>"));
         }
     }
 }
